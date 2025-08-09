@@ -32,8 +32,11 @@ const Index = () => {
       setResult(data);
       if (data?.status === "ok") {
         toast({ title: "Analysis complete", description: "Transcription and scam probability ready." });
+      } else if (data?.status === "error") {
+        const msg = data?.error?.message || data?.message || "Analysis failed";
+        toast({ title: "Analysis failed", description: msg, variant: "destructive" });
       } else {
-        toast({ title: "Analysis finished", description: "But returned a non-ok status." });
+        toast({ title: "Unexpected response", description: "Please try again." });
       }
     } catch (err: any) {
       toast({ title: "Analysis failed", description: err?.message ?? "Unexpected error", variant: "destructive" });
@@ -71,6 +74,17 @@ const Index = () => {
                 Reset
               </Button>
             </div>
+            {result?.status === "error" && (
+              <section className="mt-6">
+                <div className="rounded-md border border-input p-4">
+                  <h2 className="text-lg font-semibold mb-1">Analysis error</h2>
+                  <p className="text-sm text-muted-foreground">{result?.error?.message || result?.message || "Something went wrong."}</p>
+                  {result?.error?.code && (
+                    <p className="text-xs mt-2">Code: <span className="font-mono">{result.error.code}</span></p>
+                  )}
+                </div>
+              </section>
+            )}
 
             {result?.status === "ok" && (
               <section className="mt-6 space-y-4">

@@ -128,8 +128,9 @@ serve(async (req: Request) => {
     const { audio, filename, mimeType, size } = await req.json();
 
     if (!audio) {
-      return new Response(JSON.stringify({ status: "error", message: "No audio provided" }), {
-        status: 400,
+      const body = { status: "error", error: { code: "no_audio", message: "No audio provided" } } as const;
+      return new Response(JSON.stringify(body), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -158,9 +159,12 @@ serve(async (req: Request) => {
     });
   } catch (e) {
     console.error("analyze error:", e);
+    const msg = e instanceof Error ? e.message : "Unexpected error";
+    const code = msg.includes("insufficient_quota") ? "insufficient_quota" : (msg.includes("Missing OPENAI_API_KEY") ? "missing_api_key" : "unknown");
+    const body = { status: "error", error: { code, message: code === "insufficient_quota" ? "OpenAI quota exceeded. Please add billing or use a different key." : msg } } as const;
     return new Response(
-      JSON.stringify({ status: "error", message: e instanceof Error ? e.message : "Unexpected error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify(body),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 });
