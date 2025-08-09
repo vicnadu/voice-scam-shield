@@ -37,68 +37,89 @@ function labelFromProbability(p: number) {
   return "uncertain" as const;
 }
 
-async function transcribeWithOpenAI(audioBase64: string, filename = "audio.webm", mimeType = "audio/webm") {
-  const openAIApiKey = Deno.env.get("OPENAI_API_KEY");
-  if (!openAIApiKey) throw new Error("Missing OPENAI_API_KEY secret");
+async function transcribeWithGemini(audioBase64: string, filename = "audio.webm", mimeType = "audio/webm") {
+  const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
+  if (!geminiApiKey) throw new Error("Missing GEMINI_API_KEY secret");
 
-  const binaryAudio = processBase64Chunks(audioBase64);
-  const formData = new FormData();
-  const blob = new Blob([binaryAudio], { type: mimeType });
-  formData.append("file", blob, filename);
-  formData.append("model", "whisper-1");
-
-  const response = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+  // Use Gemini 2.0 Flash with audio input for transcription
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`, {
     method: "POST",
-    headers: { Authorization: `Bearer ${openAIApiKey}` },
-    body: formData,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      contents: [{
+        parts: [
+          { text: "Please transcribe this audio file accurately. Return only the transcript text without any additional formatting or commentary." },
+          {
+            inline_data: {
+              mime_type: mimeType || "audio/webm",
+              data: audioBase64
+            }
+          }
+        ]
+      }],
+      generationConfig: {
+        temperature: 0,
+        topK: 1,
+        topP: 0.8,
+        maxOutputTokens: 1000,
+      }
+    }),
   });
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`OpenAI transcription error: ${errText}`);
+    throw new Error(`Gemini transcription error: ${errText}`);
   }
 
   const result = await response.json();
-  return (result?.text as string) ?? "";
+  const transcript = result?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  return transcript.trim();
 }
 
-async function scamProbabilityFromTranscript(transcript: string) {
-  const openAIApiKey = Deno.env.get("OPENAI_API_KEY");
-  if (!openAIApiKey) throw new Error("Missing OPENAI_API_KEY secret");
+async function scamProbabilityWithGemini(transcript: string) {
+  const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
+  if (!geminiApiKey) throw new Error("Missing GEMINI_API_KEY secret");
 
   // Guard: empty transcript
   if (!transcript || !transcript.trim()) {
     return { probability: 0.0, reasons: ["No speech content detected"], label: labelFromProbability(0.0) } as const;
   }
 
-  const systemPrompt = `You assess voicemails for possible scams (phishing, threatening IRS calls, tech support, urgent requests for payment/wires/codes).
-Return STRICT JSON with keys: probability (0-1) and reasons (array of short strings). Do not include extra text.`;
+  const prompt = `Analyze this voicemail transcript for scam indicators (phishing, fake IRS calls, tech support scams, urgent payment requests, wire transfers, verification codes).
 
-  const userPrompt = `Voicemail transcript:\n\n${transcript}\n\nReturn JSON only.`;
+Transcript: "${transcript}"
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+Return only valid JSON with this exact structure:
+{
+  "probability": 0.0,
+  "reasons": ["reason1", "reason2"]
+}
+
+The probability should be 0.0-1.0 where 1.0 = definitely a scam. Include 2-4 specific reasons.`;
+
+  const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`, {
     method: "POST",
-    headers: {
-      "Authorization": `Bearer ${openAIApiKey}`,
-      "Content-Type": "application/json",
-    },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: userPrompt },
-      ],
-      temperature: 0,
+      contents: [{
+        parts: [{ text: prompt }]
+      }],
+      generationConfig: {
+        temperature: 0.1,
+        topK: 1,
+        topP: 0.8,
+        maxOutputTokens: 200,
+      }
     }),
   });
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`OpenAI classification error: ${errText}`);
+    throw new Error(`Gemini API error: ${errText}`);
   }
 
   const data = await response.json();
-  const content: string = data?.choices?.[0]?.message?.content ?? "";
+  const content = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
 
   let probability = 0.0;
   let reasons: string[] = [];
@@ -139,10 +160,10 @@ serve(async (req: Request) => {
 
     // 1) Transcribe
     const startedAt = Date.now();
-    const transcription = await transcribeWithOpenAI(audio, filename, mimeType);
+    const transcription = await transcribeWithGemini(audio, filename, mimeType);
 
-    // 2) Content-based scam probability
-    const scam = await scamProbabilityFromTranscript(transcription);
+    // 2) Content-based scam probability with Gemini
+    const scam = await scamProbabilityWithGemini(transcription);
     const durationMs = Date.now() - startedAt;
 
     const responseBody = {
