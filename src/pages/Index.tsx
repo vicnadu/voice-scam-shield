@@ -30,13 +30,20 @@ const Index = () => {
       const { data, error } = await analyzeAudio(file);
       if (error) throw error;
       setResult(data);
-      toast({ title: "Analysis complete (stub)", description: "Edge function returned a placeholder response." });
+      if (data?.status === "ok") {
+        toast({ title: "Analysis complete", description: "Transcription and scam probability ready." });
+      } else {
+        toast({ title: "Analysis finished", description: "But returned a non-ok status." });
+      }
     } catch (err: any) {
       toast({ title: "Analysis failed", description: err?.message ?? "Unexpected error", variant: "destructive" });
     } finally {
       setLoading(false);
     }
   };
+
+  const scamProbPercent = typeof result?.scam?.probability === "number" ? Math.round(result.scam.probability * 100) : null;
+  const scamLabel = result?.scam?.label as string | undefined;
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -65,12 +72,36 @@ const Index = () => {
               </Button>
             </div>
 
-            {result && (
-              <section className="mt-6">
-                <h2 className="text-xl font-semibold mb-2">Result</h2>
-                <pre className="text-sm overflow-auto rounded-md bg-muted p-4">
+            {result?.status === "ok" && (
+              <section className="mt-6 space-y-4">
+                {typeof result?.scam?.probability === "number" && (
+                  <div className="rounded-md border border-input p-4">
+                    <h2 className="text-lg font-semibold mb-1">Scam probability</h2>
+                    <p className="text-sm text-muted-foreground mb-1">{scamLabel ? scamLabel.replace("_", " ") : ""}</p>
+                    <p className="text-2xl font-bold">{scamProbPercent}%</p>
+                    {Array.isArray(result?.scam?.reasons) && result.scam.reasons.length > 0 && (
+                      <ul className="mt-2 list-disc pl-5 text-sm text-muted-foreground">
+                        {result.scam.reasons.map((r: string, idx: number) => (
+                          <li key={idx}>{r}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+
+                {typeof result?.transcription === "string" && result.transcription && (
+                  <div className="rounded-md border border-input p-4">
+                    <h2 className="text-lg font-semibold mb-2">Transcription</h2>
+                    <p className="whitespace-pre-wrap text-sm leading-6">{result.transcription}</p>
+                  </div>
+                )}
+
+                <details className="rounded-md border border-input p-4">
+                  <summary className="cursor-pointer text-sm">Raw response</summary>
+                  <pre className="text-xs overflow-auto rounded-md bg-muted p-4 mt-2">
 {JSON.stringify(result, null, 2)}
-                </pre>
+                  </pre>
+                </details>
               </section>
             )}
           </div>
