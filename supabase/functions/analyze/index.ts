@@ -85,17 +85,31 @@ async function scamProbabilityWithGemini(transcript: string) {
     return { probability: 0.0, reasons: ["No speech content detected"], label: labelFromProbability(0.0) } as const;
   }
 
-  const prompt = `Analyze this voicemail transcript for scam indicators (phishing, fake IRS calls, tech support scams, urgent payment requests, wire transfers, verification codes).
+  const prompt = `You are a cybersecurity expert analyzing voicemails for scam indicators. Analyze this transcript and provide a scam probability score.
 
-Transcript: "${transcript}"
+TRANSCRIPT: "${transcript}"
 
-Return only valid JSON with this exact structure:
+SCAM INDICATORS TO LOOK FOR:
+- Urgent threats (account closure, legal action, arrest)
+- Requests for personal info (SSN, passwords, payment details)
+- Pressure tactics (immediate action required, limited time)
+- Impersonation (IRS, banks, tech support, utilities)
+- Payment demands (gift cards, wire transfers, cryptocurrency)
+- Verification code requests
+- Suspicious caller behavior (robotic voice, background noise)
+
+RESPONSE FORMAT (JSON only, no other text):
 {
-  "probability": 0.0,
-  "reasons": ["reason1", "reason2"]
+  "probability": 0.85,
+  "reasons": ["Threatens immediate legal action", "Demands immediate payment", "Claims to be from IRS"]
 }
 
-The probability should be 0.0-1.0 where 1.0 = definitely a scam. Include 2-4 specific reasons.`;
+Probability scale:
+- 0.0-0.2: Legitimate call
+- 0.3-0.6: Suspicious elements  
+- 0.7-1.0: Likely scam
+
+Analyze now:`;
 
   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`, {
     method: "POST",
@@ -105,10 +119,10 @@ The probability should be 0.0-1.0 where 1.0 = definitely a scam. Include 2-4 spe
         parts: [{ text: prompt }]
       }],
       generationConfig: {
-        temperature: 0.1,
+        temperature: 0.2,
         topK: 1,
         topP: 0.8,
-        maxOutputTokens: 200,
+        maxOutputTokens: 300,
       }
     }),
   });
@@ -119,17 +133,38 @@ The probability should be 0.0-1.0 where 1.0 = definitely a scam. Include 2-4 spe
   }
 
   const data = await response.json();
-  const content = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-
+  let content = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  
+  // Clean up the response - extract JSON if wrapped in markdown
+  content = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+  
   let probability = 0.0;
-  let reasons: string[] = [];
+  let reasons: string[] = ["Analysis completed"];
+  
   try {
     const json = JSON.parse(content);
     const pRaw = Number(json?.probability);
     probability = Number.isFinite(pRaw) ? Math.max(0, Math.min(1, pRaw)) : 0.0;
-    if (Array.isArray(json?.reasons)) reasons = json.reasons.slice(0, 6).map((r: unknown) => String(r));
-  } catch (_) {
-    // Fallback: if not valid JSON, keep defaults
+    if (Array.isArray(json?.reasons)) {
+      reasons = json.reasons.slice(0, 6).map((r: unknown) => String(r)).filter(r => r.length > 0);
+    }
+  } catch (parseError) {
+    // Fallback: analyze content manually for keywords
+    const lowerTranscript = transcript.toLowerCase();
+    const scamKeywords = [
+      'irs', 'arrest', 'warrant', 'legal action', 'suspend', 'verify', 'urgent',
+      'gift card', 'wire transfer', 'social security', 'account closed', 'immediate',
+      'confirm your', 'press 1', 'call back immediately', 'final notice', 'refund'
+    ];
+    
+    const matchedKeywords = scamKeywords.filter(keyword => lowerTranscript.includes(keyword));
+    probability = Math.min(0.9, matchedKeywords.length * 0.15);
+    
+    if (matchedKeywords.length > 0) {
+      reasons = [`Contains suspicious keywords: ${matchedKeywords.slice(0, 3).join(', ')}`];
+    }
+    
+    console.log("JSON parse failed, using keyword fallback:", { parseError, content, probability, reasons });
   }
 
   const label = labelFromProbability(probability);
