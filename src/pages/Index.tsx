@@ -54,7 +54,9 @@ const Index = () => {
   const translateContent = async () => {
     if (!result || i18n.language === 'en') return;
 
-    console.log('Starting translation process...');
+    console.log('🚀 Starting translation process...');
+    console.log('🌍 Target language:', i18n.language);
+    console.log('📊 Result data:', result);
     setTranslating(true);
     const targetLang = getLanguageCode(i18n.language);
     const newTranslations: { transcription?: string; reasons?: string[]; voiceIndicators?: string[]; voiceDescription?: string } = {};
@@ -62,24 +64,27 @@ const Index = () => {
     try {
       // Translate transcription
       if (result.transcription) {
-        console.log('Translating transcription...');
+        console.log('📝 Translating transcription...');
         const { data: transcriptionData, error: transcriptionError } = await translateText(result.transcription, targetLang);
+        console.log('📝 Transcription result:', { data: transcriptionData, error: transcriptionError });
         if (transcriptionError) {
-          console.error('Transcription translation error:', transcriptionError);
+          console.error('❌ Transcription translation error:', transcriptionError);
         } else if (transcriptionData?.translatedText) {
           newTranslations.transcription = transcriptionData.translatedText;
-          console.log('Transcription translated successfully');
+          console.log('✅ Transcription translated successfully:', newTranslations.transcription);
         }
       }
 
       // Translate scam reasons
       if (result.scam?.reasons && Array.isArray(result.scam.reasons)) {
-        console.log('Translating scam reasons...');
+        console.log('🔍 Translating scam reasons...');
+        console.log('🔍 Reasons to translate:', result.scam.reasons);
         const reasonPromises = result.scam.reasons.map(async (reason: string, index: number) => {
-          console.log(`Translating reason ${index + 1}:`, reason);
+          console.log(`🔍 Translating reason ${index + 1}:`, reason);
           const { data, error } = await translateText(reason, targetLang);
+          console.log(`🔍 Reason ${index + 1} result:`, { data, error });
           if (error) {
-            console.error(`Error translating reason ${index + 1}:`, error);
+            console.error(`❌ Error translating reason ${index + 1}:`, error);
             return null;
           }
           return data?.translatedText;
@@ -87,7 +92,7 @@ const Index = () => {
         
         const reasonResults = await Promise.all(reasonPromises);
         newTranslations.reasons = reasonResults.filter(Boolean);
-        console.log('Reasons translated:', newTranslations.reasons);
+        console.log('✅ Reasons translated:', newTranslations.reasons);
       }
 
       // Translate voice analysis description
@@ -120,8 +125,9 @@ const Index = () => {
         console.log('Voice indicators translated:', newTranslations.voiceIndicators);
       }
 
-      console.log('Setting translations:', newTranslations);
+      console.log('🎯 Final translations object:', newTranslations);
       setTranslations(newTranslations);
+      console.log('✅ Translations set successfully');
     } catch (error) {
       console.error('Translation error:', error);
       toast({ 
