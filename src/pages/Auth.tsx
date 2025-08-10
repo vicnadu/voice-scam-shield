@@ -85,6 +85,7 @@ export default function Auth() {
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">{t("auth.appTitle")}</CardTitle>
+          <p className="text-sm text-muted-foreground font-medium">Voicemail Fraud Detection</p>
           <CardDescription>
             {t("auth.appDescription")}
           </CardDescription>
