@@ -17,6 +17,11 @@
   "analysisError": "خطأ في التحليل",
   "analysisErrorGeneric": "حدث خطأ أثناء التحليل",
   "errorCode": "رمز الخطأ:",
+  "newAnalysis": "تحليل جديد",
+  "history": "التاريخ",
+  "guestUser": "مستخدم ضيف",
+  "createAccount": "إنشاء حساب",
+  "signOut": "تسجيل الخروج",
   "auth": {
     "appTitle": "VoiceTranscribe",
     "appDescription": "قم بتسجيل الدخول إلى حسابك أو إنشاء حساب جديد",

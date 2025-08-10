@@ -17,6 +17,11 @@
   "analysisError": "분석 오류",
   "analysisErrorGeneric": "분석 중 오류가 발생했습니다",
   "errorCode": "오류 코드:",
+  "newAnalysis": "새 분석",
+  "history": "기록",
+  "guestUser": "게스트 사용자",
+  "createAccount": "계정 생성",
+  "signOut": "로그아웃",
   "auth": {
     "appTitle": "VoiceTranscribe",
     "appDescription": "계정에 로그인하거나 새 계정을 만드세요",

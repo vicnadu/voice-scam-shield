@@ -265,7 +265,7 @@ const Index = () => {
           <div className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span className="text-sm text-muted-foreground">
-              {isGuest ? "Guest User" : user?.email}
+              {isGuest ? t("guestUser") : user?.email}
             </span>
             {isGuest && (
               <Button
@@ -274,7 +274,7 @@ const Index = () => {
                 onClick={() => navigate("/auth")}
                 className="text-xs text-primary hover:text-primary/80"
               >
-                Create Account
+                {t("createAccount")}
               </Button>
             )}
           </div>
@@ -287,7 +287,7 @@ const Index = () => {
                 className="text-muted-foreground hover:text-foreground"
               >
                 <LogOut className="h-4 w-4 mr-1" />
-                Sign Out
+                {t("signOut")}
               </Button>
             )}
             <ThemeToggle />
@@ -303,11 +303,11 @@ const Index = () => {
           <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="analyze" className="flex items-center gap-2">
               <Upload className="h-4 w-4" />
-              New Analysis
+              {t("newAnalysis")}
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-2">
               <History className="h-4 w-4" />
-              History
+              {t("history")}
             </TabsTrigger>
           </TabsList>
 

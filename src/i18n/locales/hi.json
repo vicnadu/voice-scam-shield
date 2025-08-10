@@ -17,6 +17,11 @@
   "analysisError": "विश्लेषण त्रुटि",
   "analysisErrorGeneric": "विश्लेषण के दौरान एक त्रुटि हुई",
   "errorCode": "त्रुटि कोड:",
+  "newAnalysis": "नया विश्लेषण",
+  "history": "इतिहास",
+  "guestUser": "अतिथि उपयोगकर्ता",
+  "createAccount": "खाता बनाएं",
+  "signOut": "साइन आउट",
   "auth": {
     "appTitle": "VoiceTranscribe",
     "appDescription": "अपने खाते में साइन इन करें या नया खाता बनाएं",

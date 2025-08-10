@@ -23,6 +23,11 @@
   "likelyScam": "wahrscheinlicher Betrug",
   "possibleScam": "möglicher Betrug",
   "notScam": "kein Betrug",
+  "newAnalysis": "Neue Analyse",
+  "history": "Verlauf",
+  "guestUser": "Gast-Benutzer",
+  "createAccount": "Konto Erstellen",
+  "signOut": "Abmelden",
   "auth": {
     "appTitle": "VoiceTranscribe",
     "appDescription": "Melden Sie sich in Ihrem Konto an oder erstellen Sie ein neues",

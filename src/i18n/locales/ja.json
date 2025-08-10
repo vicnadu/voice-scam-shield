@@ -17,6 +17,11 @@
   "analysisError": "分析エラー",
   "analysisErrorGeneric": "分析中にエラーが発生しました",
   "errorCode": "エラーコード:",
+  "newAnalysis": "新しい分析",
+  "history": "履歴",
+  "guestUser": "ゲストユーザー",
+  "createAccount": "アカウント作成",
+  "signOut": "サインアウト",
   "auth": {
     "appTitle": "VoiceTranscribe",
     "appDescription": "アカウントにサインインするか、新しいアカウントを作成してください",

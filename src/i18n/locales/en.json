@@ -17,6 +17,11 @@
   "analysisError": "Analysis Error",
   "analysisErrorGeneric": "An error occurred during analysis",
   "errorCode": "Error Code:",
+  "newAnalysis": "New Analysis",
+  "history": "History",
+  "guestUser": "Guest User",
+  "createAccount": "Create Account",
+  "signOut": "Sign Out",
   "auth": {
     "appTitle": "VoiceTranscribe",
     "appDescription": "Sign in to your account or create a new one",

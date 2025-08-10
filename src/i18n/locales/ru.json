@@ -17,6 +17,11 @@
   "analysisError": "Ошибка Анализа",
   "analysisErrorGeneric": "Произошла ошибка во время анализа",
   "errorCode": "Код Ошибки:",
+  "newAnalysis": "Новый Анализ",
+  "history": "История",
+  "guestUser": "Гость",
+  "createAccount": "Создать Аккаунт",
+  "signOut": "Выйти",
   "auth": {
     "appTitle": "VoiceTranscribe",
     "appDescription": "Войдите в свой аккаунт или создайте новый",

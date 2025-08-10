@@ -23,6 +23,11 @@
   "likelyScam": "probable arnaque",
   "possibleScam": "possible arnaque",
   "notScam": "pas d'arnaque",
+  "newAnalysis": "Nouvelle Analyse",
+  "history": "Historique",
+  "guestUser": "Utilisateur Invité",
+  "createAccount": "Créer un Compte",
+  "signOut": "Se Déconnecter",
   "auth": {
     "appTitle": "VoiceTranscribe",
     "appDescription": "Connectez-vous à votre compte ou créez-en un nouveau",
