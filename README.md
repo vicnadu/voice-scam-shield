@@ -138,8 +138,8 @@ To connect a custom domain:
 
 This project was developed by:
 
-- **Victor Nadu** - Lead Developer & AI Integration Specialist
-- **Fausto Fang** - UI/UX Designer & Frontend Developer
+- **Victor Nadu**
+- **Fausto Fang**
 
 ## 🔧 Development Workflow
 
