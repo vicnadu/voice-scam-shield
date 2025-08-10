@@ -229,16 +229,7 @@ const Index = () => {
           <div className="space-y-4">
             <div>
               <label htmlFor="audio" className="block text-sm font-medium mb-2">{t("uploadLabel")}</label>
-              <Input 
-                id="audio" 
-                type="file" 
-                accept="audio/*" 
-                onChange={onFileChange}
-                className="file-input-translated file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
-                style={{
-                  '--file-button-text': `"${t('chooseFile')}"`,
-                } as React.CSSProperties}
-              />
+              <Input id="audio" type="file" accept="audio/*" onChange={onFileChange} />
               {file && (
                 <p className="mt-2 text-sm text-muted-foreground">{t("selectedFile", { filename: file.name, size: Math.round(file.size/1024) })}</p>
               )}
@@ -269,7 +260,13 @@ const Index = () => {
                 {typeof result?.scam?.probability === "number" && (
                   <div className="rounded-md border border-input p-4">
                     <h2 className="text-lg font-semibold mb-1">{t("scamProbability")}</h2>
-                    <p className="text-sm text-muted-foreground mb-1">{scamLabel ? t(scamLabel.replace("_", "")) || scamLabel.replace("_", " ") : ""}</p>
+                    <p className="text-sm text-muted-foreground mb-1">
+                      {scamLabel ? (() => {
+                        const translationKey = scamLabel.replace("_", "");
+                        const translatedLabel = t(translationKey);
+                        return translatedLabel !== translationKey ? translatedLabel : scamLabel.replace("_", " ");
+                      })() : ""}
+                    </p>
                     <p className="text-2xl font-bold">{scamProbPercent}%</p>
                     {Array.isArray(result?.scam?.reasons) && result.scam.reasons.length > 0 && (
                       <div className="mt-2">
