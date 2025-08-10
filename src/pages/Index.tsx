@@ -15,6 +15,7 @@ const Index = () => {
   const [translations, setTranslations] = useState<{
     transcription?: string;
     reasons?: string[];
+    voiceIndicators?: string[];
   }>({});
 
   // Language mapping for translation API
@@ -52,7 +53,7 @@ const Index = () => {
 
     console.log('Starting translation process...');
     const targetLang = getLanguageCode(i18n.language);
-    const newTranslations: { transcription?: string; reasons?: string[] } = {};
+    const newTranslations: { transcription?: string; reasons?: string[]; voiceIndicators?: string[] } = {};
 
     try {
       // Translate transcription
@@ -83,6 +84,24 @@ const Index = () => {
         const reasonResults = await Promise.all(reasonPromises);
         newTranslations.reasons = reasonResults.filter(Boolean);
         console.log('Reasons translated:', newTranslations.reasons);
+      }
+
+      // Translate voice analysis indicators
+      if (result.voice_analysis?.indicators && Array.isArray(result.voice_analysis.indicators)) {
+        console.log('Translating voice indicators...');
+        const indicatorPromises = result.voice_analysis.indicators.map(async (indicator: string, index: number) => {
+          console.log(`Translating voice indicator ${index + 1}:`, indicator);
+          const { data, error } = await translateText(indicator, targetLang);
+          if (error) {
+            console.error(`Error translating voice indicator ${index + 1}:`, error);
+            return null;
+          }
+          return data?.translatedText;
+        });
+        
+        const indicatorResults = await Promise.all(indicatorPromises);
+        newTranslations.voiceIndicators = indicatorResults.filter(Boolean);
+        console.log('Voice indicators translated:', newTranslations.voiceIndicators);
       }
 
       console.log('Setting translations:', newTranslations);
@@ -198,12 +217,10 @@ const Index = () => {
                         <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
                           {result.scam.reasons.map((r: string, idx: number) => (
                             <li key={idx}>
-                              <div>{r}</div>
-                              {currentLang !== 'en' && translations.reasons?.[idx] && (
-                                <div className="text-xs text-muted-foreground/80 mt-1 italic">
-                                  {translations.reasons[idx]}
-                                </div>
-                              )}
+                              {currentLang !== 'en' && translations.reasons?.[idx] ? 
+                                translations.reasons[idx] : 
+                                r
+                              }
                             </li>
                           ))}
                         </ul>
@@ -235,7 +252,12 @@ const Index = () => {
                           <p className="text-sm font-medium text-muted-foreground mb-1">{t("indicators")}</p>
                           <ul className="list-disc pl-5 text-sm text-muted-foreground">
                             {result.voice_analysis.indicators.map((indicator: string, idx: number) => (
-                              <li key={idx}>{indicator}</li>
+                              <li key={idx}>
+                                {currentLang !== 'en' && translations.voiceIndicators?.[idx] ? 
+                                  translations.voiceIndicators[idx] : 
+                                  indicator
+                                }
+                              </li>
                             ))}
                           </ul>
                         </div>
