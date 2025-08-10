@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { analyzeAudio } from "@/services/analyze";
 import { translateText } from "@/services/translate";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const { t, i18n } = useTranslation();
@@ -232,7 +233,8 @@ const Index = () => {
   return (
     <main className="min-h-screen bg-background text-foreground">
       <section className="container mx-auto max-w-2xl px-4 py-16">
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end items-center gap-2 mb-4">
+          <ThemeToggle />
           <LanguageSwitcher />
         </div>
         <header className="mb-8 text-center">
