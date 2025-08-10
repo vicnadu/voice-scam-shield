@@ -81,6 +81,22 @@ ${text}`
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Gemini API error:', errorText);
+      
+      // Handle quota exceeded - return graceful fallback
+      if (response.status === 429) {
+        console.log('Gemini API quota exceeded, returning original text');
+        return new Response(
+          JSON.stringify({ 
+            translatedText: text, // Return original text as fallback
+            sourceLanguage: sourceLanguage,
+            targetLanguage: targetLanguage,
+            fallback: true,
+            error: 'Translation quota exceeded, showing original text'
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      
       throw new Error(`Translation failed: ${response.status} ${response.statusText}`);
     }
 

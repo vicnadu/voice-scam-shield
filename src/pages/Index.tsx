@@ -72,6 +72,7 @@ const Index = () => {
         console.log('📝 Transcription result:', { data: transcriptionData, error: transcriptionError });
         if (transcriptionError) {
           console.error('❌ Transcription translation error:', transcriptionError);
+          newTranslations.transcription = result.transcription; // Use original text as fallback
         } else if (transcriptionData?.translatedText) {
           newTranslations.transcription = transcriptionData.translatedText;
           console.log('✅ Transcription translated successfully');
@@ -93,6 +94,7 @@ const Index = () => {
           
           if (error) {
             console.error(`❌ Error translating reason ${i + 1}:`, error);
+            translatedReasons.push(reason); // Use original text as fallback
           } else if (data?.translatedText) {
             translatedReasons.push(data.translatedText);
           }
@@ -114,6 +116,7 @@ const Index = () => {
         const { data: descriptionData, error: descriptionError } = await translateText(result.voice_analysis.description, targetLang);
         if (descriptionError) {
           console.error('❌ Voice description translation error:', descriptionError);
+          newTranslations.voiceDescription = result.voice_analysis.description; // Use original text as fallback
         } else if (descriptionData?.translatedText) {
           newTranslations.voiceDescription = descriptionData.translatedText;
           console.log('✅ Voice description translated successfully');
@@ -134,6 +137,7 @@ const Index = () => {
           
           if (error) {
             console.error(`❌ Error translating voice indicator ${i + 1}:`, error);
+            translatedIndicators.push(indicator); // Use original text as fallback
           } else if (data?.translatedText) {
             translatedIndicators.push(data.translatedText);
           }
