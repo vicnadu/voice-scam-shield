@@ -71,6 +71,33 @@ export type Database = {
         }
         Relationships: []
       }
+      voice_analysis_history: {
+        Row: {
+          analysis_result: Json
+          created_at: string
+          file_size: number | null
+          filename: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          analysis_result: Json
+          created_at?: string
+          file_size?: number | null
+          filename: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          analysis_result?: Json
+          created_at?: string
+          file_size?: number | null
+          filename?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
