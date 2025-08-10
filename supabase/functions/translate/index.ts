@@ -31,43 +31,70 @@ serve(async (req) => {
       );
     }
 
-    const googleTranslateApiKey = Deno.env.get('GOOGLE_TRANSLATE_API_KEY');
+    const geminiApiKey = Deno.env.get('GEMINI_API_KEY');
     
-    if (!googleTranslateApiKey) {
-      throw new Error('Google Translate API key not configured');
+    if (!geminiApiKey) {
+      throw new Error('Gemini API key not configured');
     }
 
-    // Use Google Translate API
+    // Language mapping for better translation context
+    const languageNames: { [key: string]: string } = {
+      'es': 'Spanish',
+      'fr': 'French', 
+      'de': 'German',
+      'it': 'Italian',
+      'pt': 'Portuguese',
+      'ru': 'Russian',
+      'ja': 'Japanese',
+      'zh': 'Chinese',
+      'ko': 'Korean',
+      'ar': 'Arabic',
+      'hi': 'Hindi'
+    };
+
+    const targetLanguageName = languageNames[targetLanguage] || targetLanguage;
+
+    // Use Gemini for translation
     const response = await fetch(
-      `https://translation.googleapis.com/language/translate/v2?key=${googleTranslateApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${geminiApiKey}`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          q: text,
-          target: targetLanguage,
-          source: sourceLanguage,
-          format: 'text'
+          contents: [{
+            parts: [{
+              text: `Translate the following text to ${targetLanguageName}. Only return the translation, no explanations or additional text:
+
+${text}`
+            }]
+          }],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 1000,
+          }
         }),
       }
     );
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Google Translate API error:', errorText);
+      console.error('Gemini API error:', errorText);
       throw new Error(`Translation failed: ${response.status} ${response.statusText}`);
     }
 
     const result = await response.json();
-    const translatedText = result.data.translations[0].translatedText;
-    const detectedSourceLanguage = result.data.translations[0].detectedSourceLanguage || sourceLanguage;
+    const translatedText = result.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+    if (!translatedText) {
+      throw new Error('No translation received from Gemini');
+    }
 
     return new Response(
       JSON.stringify({ 
         translatedText,
-        sourceLanguage: detectedSourceLanguage,
+        sourceLanguage: sourceLanguage,
         targetLanguage: targetLanguage 
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
