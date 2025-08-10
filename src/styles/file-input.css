@@ -1,0 +1,13 @@
+/* Custom file input styling with dynamic text */
+.file-input-translated::file-selector-button {
+  content: var(--file-button-text, "Choose File");
+}
+
+/* For older browser support */
+.file-input-translated::-webkit-file-upload-button {
+  content: var(--file-button-text, "Choose File");
+}
+
+.file-input-translated::-ms-browse {
+  content: var(--file-button-text, "Choose File");
+}

@@ -19,6 +19,10 @@
   "analysisError": "Analysis error",
   "analysisErrorGeneric": "Something went wrong.",
   "errorCode": "Code:",
+  "chooseFile": "Choose File",
+  "likelyScam": "likely scam",
+  "possibleScam": "possible scam",
+  "notScam": "not scam",
   "toast": {
     "invalidFile": "Invalid file",
     "invalidFileDesc": "Please select an audio file.",
