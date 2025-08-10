@@ -16,6 +16,7 @@ const Index = () => {
     transcription?: string;
     reasons?: string[];
     voiceIndicators?: string[];
+    voiceDescription?: string;
   }>({});
 
   // Language mapping for translation API
@@ -53,7 +54,7 @@ const Index = () => {
 
     console.log('Starting translation process...');
     const targetLang = getLanguageCode(i18n.language);
-    const newTranslations: { transcription?: string; reasons?: string[]; voiceIndicators?: string[] } = {};
+    const newTranslations: { transcription?: string; reasons?: string[]; voiceIndicators?: string[]; voiceDescription?: string } = {};
 
     try {
       // Translate transcription
@@ -84,6 +85,18 @@ const Index = () => {
         const reasonResults = await Promise.all(reasonPromises);
         newTranslations.reasons = reasonResults.filter(Boolean);
         console.log('Reasons translated:', newTranslations.reasons);
+      }
+
+      // Translate voice analysis description
+      if (result.voice_analysis?.description) {
+        console.log('Translating voice description...');
+        const { data: descriptionData, error: descriptionError } = await translateText(result.voice_analysis.description, targetLang);
+        if (descriptionError) {
+          console.error('Voice description translation error:', descriptionError);
+        } else if (descriptionData?.translatedText) {
+          newTranslations.voiceDescription = descriptionData.translatedText;
+          console.log('Voice description translated successfully');
+        }
       }
 
       // Translate voice analysis indicators
@@ -245,7 +258,12 @@ const Index = () => {
                         </p>
                       )}
                       {result.voice_analysis.description && (
-                        <p className="text-sm text-muted-foreground">{result.voice_analysis.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {currentLang !== 'en' && translations.voiceDescription ? 
+                            translations.voiceDescription : 
+                            result.voice_analysis.description
+                          }
+                        </p>
                       )}
                       {Array.isArray(result.voice_analysis.indicators) && result.voice_analysis.indicators.length > 0 && (
                         <div>
