@@ -1,5 +1,5 @@
 {
-  "title": "VoiceTranscribe",
+  "title": "Faustic",
   "subtitle": "AI搭載音声分析と詐欺検出",
   "uploadLabel": "音声ファイルをアップロード",
   "selectedFile": "選択済み: {{filename}} ({{size}}KB)",
@@ -23,7 +23,7 @@
   "createAccount": "アカウント作成",
   "signOut": "サインアウト",
   "auth": {
-    "appTitle": "VoiceTranscribe",
+    "appTitle": "Faustic",
     "appDescription": "アカウントにサインインするか、新しいアカウントを作成してください",
     "signIn": "サインイン",
     "signUp": "サインアップ",

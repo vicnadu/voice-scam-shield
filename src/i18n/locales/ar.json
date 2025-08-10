@@ -1,5 +1,5 @@
 {
-  "title": "VoiceTranscribe",
+  "title": "Faustic",
   "subtitle": "تحليل صوتي بالذكاء الاصطناعي وكشف الاحتيال",
   "uploadLabel": "رفع ملف صوتي",
   "selectedFile": "تم اختيار: {{filename}} ({{size}}كيلوبايت)",
@@ -23,7 +23,7 @@
   "createAccount": "إنشاء حساب",
   "signOut": "تسجيل الخروج",
   "auth": {
-    "appTitle": "VoiceTranscribe",
+    "appTitle": "Faustic",
     "appDescription": "قم بتسجيل الدخول إلى حسابك أو إنشاء حساب جديد",
     "signIn": "تسجيل الدخول",
     "signUp": "إنشاء حساب",

@@ -1,5 +1,5 @@
 {
-  "title": "VoiceTranscribe",
+  "title": "Faustic",
   "subtitle": "ИИ-анализ голоса и обнаружение мошенничества",
   "uploadLabel": "Загрузить Аудиофайл",
   "selectedFile": "Выбрано: {{filename}} ({{size}}КБ)",
@@ -23,7 +23,7 @@
   "createAccount": "Создать Аккаунт",
   "signOut": "Выйти",
   "auth": {
-    "appTitle": "VoiceTranscribe",
+    "appTitle": "Faustic",
     "appDescription": "Войдите в свой аккаунт или создайте новый",
     "signIn": "Войти",
     "signUp": "Зарегистрироваться",

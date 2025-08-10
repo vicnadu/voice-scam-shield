@@ -1,5 +1,5 @@
 {
-  "title": "VoiceTranscribe",
+  "title": "Faustic",
   "subtitle": "Análise de voz baseada em IA e detecção de golpes",
   "uploadLabel": "Enviar Arquivo de Áudio",
   "selectedFile": "Selecionado: {{filename}} ({{size}}KB)",
@@ -46,7 +46,7 @@
     "historyCleared": "Histórico limpo"
   },
   "auth": {
-    "appTitle": "VoiceTranscribe",
+    "appTitle": "Faustic",
     "appDescription": "Entre na sua conta ou crie uma nova",
     "signIn": "Entrar",
     "signUp": "Registrar-se",

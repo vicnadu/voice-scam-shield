@@ -1,5 +1,5 @@
 {
-  "title": "VoiceTranscribe",
+  "title": "Faustic",
   "subtitle": "AI-संचालित आवाज विश्लेषण और घोटाला पहचान",
   "uploadLabel": "ऑडियो फ़ाइल अपलोड करें",
   "selectedFile": "चयनित: {{filename}} ({{size}}KB)",
@@ -23,7 +23,7 @@
   "createAccount": "खाता बनाएं",
   "signOut": "साइन आउट",
   "auth": {
-    "appTitle": "VoiceTranscribe",
+    "appTitle": "Faustic",
     "appDescription": "अपने खाते में साइन इन करें या नया खाता बनाएं",
     "signIn": "साइन इन",
     "signUp": "साइन अप",

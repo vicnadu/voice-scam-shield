@@ -1,5 +1,5 @@
 {
-  "title": "VoiceTranscribe",
+  "title": "Faustic",
   "subtitle": "AI驱动的语音分析和诈骗检测",
   "uploadLabel": "上传音频文件",
   "selectedFile": "已选择: {{filename}} ({{size}}KB)",
@@ -23,7 +23,7 @@
   "createAccount": "创建账户",
   "signOut": "退出登录",
   "auth": {
-    "appTitle": "VoiceTranscribe",
+    "appTitle": "Faustic",
     "appDescription": "登录您的账户或创建新账户",
     "signIn": "登录",
     "signUp": "注册",

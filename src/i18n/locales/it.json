@@ -1,5 +1,5 @@
 {
-  "title": "VoiceTranscribe",
+  "title": "Faustic",
   "subtitle": "Analisi vocale basata su IA e rilevamento truffe",
   "uploadLabel": "Carica File Audio",
   "selectedFile": "Selezionato: {{filename}} ({{size}}KB)",
@@ -23,7 +23,7 @@
   "createAccount": "Crea Account",
   "signOut": "Disconnetti",
   "auth": {
-    "appTitle": "VoiceTranscribe",
+    "appTitle": "Faustic",
     "appDescription": "Accedi al tuo account o creane uno nuovo",
     "signIn": "Accedi",
     "signUp": "Registrati",
