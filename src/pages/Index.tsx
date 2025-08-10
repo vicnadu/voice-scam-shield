@@ -36,42 +36,64 @@ const Index = () => {
     return mapping[langCode] || 'en';
   };
 
-  // Auto-translate content when language changes
+  // Auto-translate content when language changes or result updates
   useEffect(() => {
     if (result?.status === "ok" && i18n.language !== 'en') {
+      console.log('Triggering translation for language:', i18n.language);
       translateContent();
+    } else if (i18n.language === 'en') {
+      // Clear translations when switching back to English
+      setTranslations({});
     }
   }, [i18n.language, result]);
 
   const translateContent = async () => {
     if (!result || i18n.language === 'en') return;
 
+    console.log('Starting translation process...');
     const targetLang = getLanguageCode(i18n.language);
     const newTranslations: { transcription?: string; reasons?: string[] } = {};
 
     try {
       // Translate transcription
       if (result.transcription) {
-        const { data: transcriptionData } = await translateText(result.transcription, targetLang);
-        if (transcriptionData?.translatedText) {
+        console.log('Translating transcription...');
+        const { data: transcriptionData, error: transcriptionError } = await translateText(result.transcription, targetLang);
+        if (transcriptionError) {
+          console.error('Transcription translation error:', transcriptionError);
+        } else if (transcriptionData?.translatedText) {
           newTranslations.transcription = transcriptionData.translatedText;
+          console.log('Transcription translated successfully');
         }
       }
 
       // Translate scam reasons
       if (result.scam?.reasons && Array.isArray(result.scam.reasons)) {
-        const reasonPromises = result.scam.reasons.map((reason: string) => 
-          translateText(reason, targetLang)
-        );
+        console.log('Translating scam reasons...');
+        const reasonPromises = result.scam.reasons.map(async (reason: string, index: number) => {
+          console.log(`Translating reason ${index + 1}:`, reason);
+          const { data, error } = await translateText(reason, targetLang);
+          if (error) {
+            console.error(`Error translating reason ${index + 1}:`, error);
+            return null;
+          }
+          return data?.translatedText;
+        });
+        
         const reasonResults = await Promise.all(reasonPromises);
-        newTranslations.reasons = reasonResults
-          .map(({ data }) => data?.translatedText)
-          .filter(Boolean);
+        newTranslations.reasons = reasonResults.filter(Boolean);
+        console.log('Reasons translated:', newTranslations.reasons);
       }
 
+      console.log('Setting translations:', newTranslations);
       setTranslations(newTranslations);
     } catch (error) {
       console.error('Translation error:', error);
+      toast({ 
+        title: "Translation Error", 
+        description: "Failed to translate content. Please try again.", 
+        variant: "destructive" 
+      });
     }
   };
 
@@ -102,7 +124,8 @@ const Index = () => {
         toast({ title: t("toast.analysisComplete"), description: t("toast.analysisCompleteDesc") });
         // Auto-translate if UI language is not English
         if (i18n.language !== 'en') {
-          setTimeout(() => translateContent(), 100);
+          console.log('Analysis complete, triggering translation...');
+          setTimeout(() => translateContent(), 500);
         }
       } else if (data?.status === "error") {
         const msg = data?.error?.message || data?.message || t("toast.analysisFailed");
@@ -227,16 +250,22 @@ const Index = () => {
                     <div className="space-y-3">
                       <div>
                         <h3 className="text-sm font-medium text-muted-foreground mb-1">Original:</h3>
-                        <p className="whitespace-pre-wrap text-sm leading-6">{result.transcription}</p>
+                        <p className="whitespace-pre-wrap text-sm leading-6 bg-muted/30 p-2 rounded">{result.transcription}</p>
                       </div>
-                      {currentLang !== 'en' && translations.transcription && (
+                      {currentLang !== 'en' && (
                         <div>
                           <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                            {t("title")} ({currentLang.toUpperCase()}):
+                            {currentLang.toUpperCase()} Translation:
                           </h3>
-                          <p className="whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
-                            {translations.transcription}
-                          </p>
+                          {translations.transcription ? (
+                            <p className="whitespace-pre-wrap text-sm leading-6 bg-primary/10 p-2 rounded">
+                              {translations.transcription}
+                            </p>
+                          ) : (
+                            <p className="text-sm text-muted-foreground italic p-2">
+                              Translating...
+                            </p>
+                          )}
                         </div>
                       )}
                     </div>
