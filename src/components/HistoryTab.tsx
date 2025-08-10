@@ -13,9 +13,11 @@ import {
   clearGuestHistory 
 } from "@/services/history";
 import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 export const HistoryTab = () => {
   const { user, isGuest } = useAuth();
+  const { t } = useTranslation();
   const [history, setHistory] = useState<AnalysisHistory[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
@@ -35,10 +37,10 @@ export const HistoryTab = () => {
         if (error) throw error;
         setHistory(data || []);
       }
-    } catch (error) {
-      console.error('Failed to load history:', error);
-      toast.error("Failed to load history");
-    } finally {
+      } catch (error) {
+        console.error('Failed to load history:', error);
+        toast.error(t("history.failedToLoad"));
+      } finally {
       setLoading(false);
     }
   };
@@ -50,16 +52,16 @@ export const HistoryTab = () => {
         const guestHistory = getGuestHistory().filter(item => item.id !== id);
         localStorage.setItem('voice_analysis_guest_history', JSON.stringify(guestHistory));
         setHistory(guestHistory);
-        toast.success("Analysis deleted");
+        toast.success(t("history.analysisDeleted"));
       } else if (user) {
         const { error } = await deleteUserAnalysis(id);
         if (error) throw error;
         await loadHistory(); // Reload after deletion
-        toast.success("Analysis deleted");
+        toast.success(t("history.analysisDeleted"));
       }
     } catch (error) {
       console.error('Failed to delete analysis:', error);
-      toast.error("Failed to delete analysis");
+      toast.error(t("history.failedToDelete"));
     }
   };
 
@@ -67,7 +69,7 @@ export const HistoryTab = () => {
     if (isGuest) {
       clearGuestHistory();
       setHistory([]);
-      toast.success("History cleared");
+      toast.success(t("history.historyCleared"));
     }
   };
 
@@ -92,9 +94,9 @@ export const HistoryTab = () => {
   };
 
   const getScamLevel = (probability: number) => {
-    if (probability >= 0.7) return { label: 'High Risk', color: 'destructive' };
-    if (probability >= 0.4) return { label: 'Medium Risk', color: 'secondary' };
-    return { label: 'Low Risk', color: 'default' };
+    if (probability >= 0.7) return { label: t("history.highRisk"), color: 'destructive' };
+    if (probability >= 0.4) return { label: t("history.mediumRisk"), color: 'secondary' };
+    return { label: t("history.lowRisk"), color: 'default' };
   };
 
   if (loading) {
@@ -109,11 +111,11 @@ export const HistoryTab = () => {
     return (
       <div className="text-center py-8">
         <FileAudio className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-        <h3 className="text-lg font-medium text-muted-foreground mb-2">No Analysis History</h3>
+        <h3 className="text-lg font-medium text-muted-foreground mb-2">{t("history.noHistory")}</h3>
         <p className="text-sm text-muted-foreground">
           {isGuest 
-            ? "Your analysis history will appear here (last 10 analyses)" 
-            : "Your voice analysis history will appear here"
+            ? t("history.guestHistoryDesc")
+            : t("history.userHistoryDesc")
           }
         </p>
       </div>
@@ -124,17 +126,17 @@ export const HistoryTab = () => {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-lg font-semibold">Analysis History</h2>
+          <h2 className="text-lg font-semibold">{t("history.analysisHistory")}</h2>
           <p className="text-sm text-muted-foreground">
             {isGuest 
-              ? `${history.length} of 10 analyses (guest mode)`
-              : `${history.length} analyses`
+              ? t("history.guestModeCount", { count: history.length })
+              : t("history.analysesCount", { count: history.length })
             }
           </p>
         </div>
         {isGuest && history.length > 0 && (
           <Button variant="outline" size="sm" onClick={handleClearAll}>
-            Clear All
+            {t("history.clearAll")}
           </Button>
         )}
       </div>
@@ -183,99 +185,99 @@ export const HistoryTab = () => {
                 
                 <CardContent className="pt-0">
                   {/* Always show scam probability summary */}
-                  {item.analysis_result?.scam?.probability !== undefined && (
-                    <div className="flex items-center gap-2 mb-3">
-                      <AlertTriangle className="h-4 w-4" />
-                      <span className="text-sm font-medium">Scam Probability:</span>
-                      <Badge variant={getScamLevel(item.analysis_result.scam.probability).color as any}>
-                        {Math.round(item.analysis_result.scam.probability * 100)}% - {getScamLevel(item.analysis_result.scam.probability).label}
-                      </Badge>
-                    </div>
-                  )}
+                   {item.analysis_result?.scam?.probability !== undefined && (
+                     <div className="flex items-center gap-2 mb-3">
+                       <AlertTriangle className="h-4 w-4" />
+                       <span className="text-sm font-medium">{t("scamProbability")}:</span>
+                       <Badge variant={getScamLevel(item.analysis_result.scam.probability).color as any}>
+                         {Math.round(item.analysis_result.scam.probability * 100)}% - {getScamLevel(item.analysis_result.scam.probability).label}
+                       </Badge>
+                     </div>
+                   )}
                   
                   {/* Show truncated transcription when collapsed */}
-                  {!isExpanded && item.analysis_result?.transcription && (
-                    <div className="bg-muted/30 p-3 rounded-md">
-                      <p className="text-xs font-medium text-muted-foreground mb-1">Transcription preview:</p>
-                      <p className="text-sm line-clamp-2">
-                        {item.analysis_result.transcription}
-                      </p>
-                      <Button variant="ghost" size="sm" className="mt-2 p-0 h-auto text-xs text-primary">
-                        Click to view full analysis
-                      </Button>
-                    </div>
-                  )}
+                   {!isExpanded && item.analysis_result?.transcription && (
+                     <div className="bg-muted/30 p-3 rounded-md">
+                       <p className="text-xs font-medium text-muted-foreground mb-1">{t("history.transcriptionPreview")}:</p>
+                       <p className="text-sm line-clamp-2">
+                         {item.analysis_result.transcription}
+                       </p>
+                       <Button variant="ghost" size="sm" className="mt-2 p-0 h-auto text-xs text-primary">
+                         {t("history.clickToViewFull")}
+                       </Button>
+                     </div>
+                   )}
 
                   {/* Expanded content */}
                   <CollapsibleContent className="space-y-4">
-                    {/* Full transcription */}
-                    {item.analysis_result?.transcription && (
-                      <div className="bg-muted/30 p-4 rounded-md">
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Full Transcription:</h4>
-                        <p className="text-sm whitespace-pre-wrap leading-relaxed">
-                          {item.analysis_result.transcription}
-                        </p>
-                      </div>
-                    )}
+                     {/* Full transcription */}
+                     {item.analysis_result?.transcription && (
+                       <div className="bg-muted/30 p-4 rounded-md">
+                         <h4 className="text-sm font-medium text-muted-foreground mb-2">{t("history.fullTranscription")}:</h4>
+                         <p className="text-sm whitespace-pre-wrap leading-relaxed">
+                           {item.analysis_result.transcription}
+                         </p>
+                       </div>
+                     )}
 
-                    {/* Detailed scam analysis */}
-                    {item.analysis_result?.scam && (
-                      <div className="bg-muted/30 p-4 rounded-md">
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Scam Analysis Details:</h4>
-                        {item.analysis_result.scam.label && (
-                          <p className="text-sm mb-2">
-                            <span className="font-medium">Classification:</span> {item.analysis_result.scam.label.replace("_", " ")}
-                          </p>
-                        )}
-                        {Array.isArray(item.analysis_result.scam.reasons) && item.analysis_result.scam.reasons.length > 0 && (
-                          <div>
-                            <p className="text-sm font-medium mb-1">Risk Indicators:</p>
-                            <ul className="list-disc pl-5 text-sm space-y-1">
-                              {item.analysis_result.scam.reasons.map((reason: string, idx: number) => (
-                                <li key={idx}>{reason}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    )}
+                     {/* Detailed scam analysis */}
+                     {item.analysis_result?.scam && (
+                       <div className="bg-muted/30 p-4 rounded-md">
+                         <h4 className="text-sm font-medium text-muted-foreground mb-2">{t("history.scamAnalysisDetails")}:</h4>
+                         {item.analysis_result.scam.label && (
+                           <p className="text-sm mb-2">
+                             <span className="font-medium">{t("history.classification")}:</span> {item.analysis_result.scam.label.replace("_", " ")}
+                           </p>
+                         )}
+                         {Array.isArray(item.analysis_result.scam.reasons) && item.analysis_result.scam.reasons.length > 0 && (
+                           <div>
+                             <p className="text-sm font-medium mb-1">{t("indicators")}:</p>
+                             <ul className="list-disc pl-5 text-sm space-y-1">
+                               {item.analysis_result.scam.reasons.map((reason: string, idx: number) => (
+                                 <li key={idx}>{reason}</li>
+                               ))}
+                             </ul>
+                           </div>
+                         )}
+                       </div>
+                     )}
 
-                    {/* Voice analysis details */}
-                    {item.analysis_result?.voice_analysis && (
-                      <div className="bg-muted/30 p-4 rounded-md">
-                        <h4 className="text-sm font-medium text-muted-foreground mb-2">Voice Analysis:</h4>
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className={`inline-block w-3 h-3 rounded-full ${item.analysis_result.voice_analysis.sounds_artificial ? 'bg-red-500' : 'bg-green-500'}`}></span>
-                            <span className="text-sm">
-                              {item.analysis_result.voice_analysis.sounds_artificial ? "Artificial Voice Detected" : "Natural Voice"}
-                            </span>
-                            {item.analysis_result.voice_analysis.confidence > 0 && (
-                              <span className="text-xs text-muted-foreground">
-                                ({Math.round(item.analysis_result.voice_analysis.confidence * 100)}% confidence)
-                              </span>
-                            )}
-                          </div>
-                          
-                          {item.analysis_result.voice_analysis.description && (
-                            <p className="text-sm">
-                              <span className="font-medium">Analysis:</span> {item.analysis_result.voice_analysis.description}
-                            </p>
-                          )}
-                          
-                          {Array.isArray(item.analysis_result.voice_analysis.indicators) && item.analysis_result.voice_analysis.indicators.length > 0 && (
-                            <div>
-                              <p className="text-sm font-medium mb-1">Voice Indicators:</p>
-                              <ul className="list-disc pl-5 text-sm space-y-1">
-                                {item.analysis_result.voice_analysis.indicators.map((indicator: string, idx: number) => (
-                                  <li key={idx}>{indicator}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
+                     {/* Voice analysis details */}
+                     {item.analysis_result?.voice_analysis && (
+                       <div className="bg-muted/30 p-4 rounded-md">
+                         <h4 className="text-sm font-medium text-muted-foreground mb-2">{t("voiceAnalysis")}:</h4>
+                         <div className="space-y-2">
+                           <div className="flex items-center gap-2">
+                             <span className={`inline-block w-3 h-3 rounded-full ${item.analysis_result.voice_analysis.sounds_artificial ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                             <span className="text-sm">
+                               {item.analysis_result.voice_analysis.sounds_artificial ? t("artificialVoiceDetected") : t("naturalVoice")}
+                             </span>
+                             {item.analysis_result.voice_analysis.confidence > 0 && (
+                               <span className="text-xs text-muted-foreground">
+                                 ({t("confidence", { percent: Math.round(item.analysis_result.voice_analysis.confidence * 100) })})
+                               </span>
+                             )}
+                           </div>
+                           
+                           {item.analysis_result.voice_analysis.description && (
+                             <p className="text-sm">
+                               <span className="font-medium">{t("history.analysis")}:</span> {item.analysis_result.voice_analysis.description}
+                             </p>
+                           )}
+                           
+                           {Array.isArray(item.analysis_result.voice_analysis.indicators) && item.analysis_result.voice_analysis.indicators.length > 0 && (
+                             <div>
+                               <p className="text-sm font-medium mb-1">{t("history.voiceIndicators")}:</p>
+                               <ul className="list-disc pl-5 text-sm space-y-1">
+                                 {item.analysis_result.voice_analysis.indicators.map((indicator: string, idx: number) => (
+                                   <li key={idx}>{indicator}</li>
+                                 ))}
+                               </ul>
+                             </div>
+                           )}
+                         </div>
+                       </div>
+                     )}
                   </CollapsibleContent>
                 </CardContent>
               </Collapsible>
