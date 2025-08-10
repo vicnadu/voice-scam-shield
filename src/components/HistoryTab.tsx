@@ -146,13 +146,10 @@ export const HistoryTab = () => {
           const isExpanded = expandedItems.has(item.id);
           return (
             <Card key={item.id} className="relative">
-              <Collapsible>
+              <Collapsible open={isExpanded} onOpenChange={() => toggleExpanded(item.id)}>
                 <CardHeader className="pb-3">
                   <div className="flex justify-between items-start">
-                    <CollapsibleTrigger 
-                      className="flex-1 text-left"
-                      onClick={() => toggleExpanded(item.id)}
-                    >
+                    <CollapsibleTrigger className="flex-1 text-left">
                       <div className="flex items-center gap-2 mb-1">
                         {isExpanded ? (
                           <ChevronDown className="h-4 w-4 text-muted-foreground" />
