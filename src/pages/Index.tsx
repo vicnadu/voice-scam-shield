@@ -17,6 +17,7 @@ const Index = () => {
     reasons?: string[];
     voiceIndicators?: string[];
     voiceDescription?: string;
+    scamLabel?: string;
   }>({});
   const [translating, setTranslating] = useState(false);
 
@@ -59,7 +60,7 @@ const Index = () => {
     console.log('📊 Result data:', result);
     setTranslating(true);
     const targetLang = getLanguageCode(i18n.language);
-    const newTranslations: { transcription?: string; reasons?: string[]; voiceIndicators?: string[]; voiceDescription?: string } = {};
+    const newTranslations: { transcription?: string; reasons?: string[]; voiceIndicators?: string[]; voiceDescription?: string; scamLabel?: string; } = {};
 
     try {
       // Helper function to add delay between requests
@@ -78,6 +79,20 @@ const Index = () => {
           console.log('✅ Transcription translated successfully');
         }
         await delay(1000); // Wait 1 second before next request
+      }
+
+      // Translate scam label if it exists
+      if (result?.scam?.label) {
+        console.log('🏷️ Translating scam label:', result.scam.label);
+        const { data: labelData, error: labelError } = await translateText(result.scam.label.replace("_", " "), targetLang);
+        if (labelError) {
+          console.error('❌ Scam label translation error:', labelError);
+          newTranslations.scamLabel = result.scam.label.replace("_", " "); // Use original text as fallback
+        } else if (labelData?.translatedText) {
+          newTranslations.scamLabel = labelData.translatedText;
+          console.log('✅ Scam label translated successfully');
+        }
+        await delay(1000);
       }
 
       // Translate scam reasons sequentially with delays
@@ -261,11 +276,11 @@ const Index = () => {
                   <div className="rounded-md border border-input p-4">
                     <h2 className="text-lg font-semibold mb-1">{t("scamProbability")}</h2>
                     <p className="text-sm text-muted-foreground mb-1">
-                      {scamLabel ? (() => {
-                        const translationKey = scamLabel.replace("_", "");
-                        const translatedLabel = t(translationKey);
-                        return translatedLabel !== translationKey ? translatedLabel : scamLabel.replace("_", " ");
-                      })() : ""}
+                      {scamLabel ? (
+                        currentLang !== 'en' && translations.scamLabel 
+                          ? translations.scamLabel 
+                          : scamLabel.replace("_", " ")
+                      ) : ""}
                     </p>
                     <p className="text-2xl font-bold">{scamProbPercent}%</p>
                     {Array.isArray(result?.scam?.reasons) && result.scam.reasons.length > 0 && (
