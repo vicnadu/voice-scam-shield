@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { analyzeAudio } from "@/services/analyze";
 import { translateText } from "@/services/translate";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
@@ -18,6 +18,7 @@ const Index = () => {
     voiceIndicators?: string[];
     voiceDescription?: string;
   }>({});
+  const [translating, setTranslating] = useState(false);
 
   // Language mapping for translation API
   const getLanguageCode = (langCode: string) => {
@@ -46,6 +47,7 @@ const Index = () => {
     } else if (i18n.language === 'en') {
       // Clear translations when switching back to English
       setTranslations({});
+      setTranslating(false);
     }
   }, [i18n.language, result]);
 
@@ -53,6 +55,7 @@ const Index = () => {
     if (!result || i18n.language === 'en') return;
 
     console.log('Starting translation process...');
+    setTranslating(true);
     const targetLang = getLanguageCode(i18n.language);
     const newTranslations: { transcription?: string; reasons?: string[]; voiceIndicators?: string[]; voiceDescription?: string } = {};
 
@@ -126,6 +129,8 @@ const Index = () => {
         description: "Failed to translate content. Please try again.", 
         variant: "destructive" 
       });
+    } finally {
+      setTranslating(false);
     }
   };
 
@@ -138,7 +143,7 @@ const Index = () => {
     }
     setFile(f);
     setResult(null);
-    setTranslations({});
+    setTranslating(false);
   };
 
   const onAnalyze = async () => {
@@ -227,16 +232,23 @@ const Index = () => {
                     {Array.isArray(result?.scam?.reasons) && result.scam.reasons.length > 0 && (
                       <div className="mt-2">
                         <h3 className="text-sm font-medium mb-1">{t("indicators")}</h3>
-                        <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-                          {result.scam.reasons.map((r: string, idx: number) => (
-                            <li key={idx}>
-                              {currentLang !== 'en' && translations.reasons?.[idx] ? 
-                                translations.reasons[idx] : 
-                                r
-                              }
-                            </li>
-                          ))}
-                        </ul>
+                        {translating && currentLang !== 'en' ? (
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary"></div>
+                            <span>Translating...</span>
+                          </div>
+                        ) : (
+                          <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+                            {result.scam.reasons.map((r: string, idx: number) => (
+                              <li key={idx}>
+                                {currentLang !== 'en' && translations.reasons?.[idx] ? 
+                                  translations.reasons[idx] : 
+                                  r
+                                }
+                              </li>
+                            ))}
+                          </ul>
+                        )}
                       </div>
                     )}
                   </div>
@@ -258,26 +270,42 @@ const Index = () => {
                         </p>
                       )}
                       {result.voice_analysis.description && (
-                        <p className="text-sm text-muted-foreground">
-                          {currentLang !== 'en' && translations.voiceDescription ? 
-                            translations.voiceDescription : 
-                            result.voice_analysis.description
-                          }
-                        </p>
+                        <div className="text-sm text-muted-foreground">
+                          {translating && currentLang !== 'en' && !translations.voiceDescription ? (
+                            <div className="flex items-center gap-2">
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary"></div>
+                              <span>Translating description...</span>
+                            </div>
+                          ) : (
+                            <p>
+                              {currentLang !== 'en' && translations.voiceDescription ? 
+                                translations.voiceDescription : 
+                                result.voice_analysis.description
+                              }
+                            </p>
+                          )}
+                        </div>
                       )}
                       {Array.isArray(result.voice_analysis.indicators) && result.voice_analysis.indicators.length > 0 && (
                         <div>
                           <p className="text-sm font-medium text-muted-foreground mb-1">{t("indicators")}</p>
-                          <ul className="list-disc pl-5 text-sm text-muted-foreground">
-                            {result.voice_analysis.indicators.map((indicator: string, idx: number) => (
-                              <li key={idx}>
-                                {currentLang !== 'en' && translations.voiceIndicators?.[idx] ? 
-                                  translations.voiceIndicators[idx] : 
-                                  indicator
-                                }
-                              </li>
-                            ))}
-                          </ul>
+                          {translating && currentLang !== 'en' && (!translations.voiceIndicators || translations.voiceIndicators.length === 0) ? (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary"></div>
+                              <span>Translating indicators...</span>
+                            </div>
+                          ) : (
+                            <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                              {result.voice_analysis.indicators.map((indicator: string, idx: number) => (
+                                <li key={idx}>
+                                  {currentLang !== 'en' && translations.voiceIndicators?.[idx] ? 
+                                    translations.voiceIndicators[idx] : 
+                                    indicator
+                                  }
+                                </li>
+                              ))}
+                            </ul>
+                          )}
                         </div>
                       )}
                     </div>
@@ -288,26 +316,31 @@ const Index = () => {
                   <div className="rounded-md border border-input p-4">
                     <h2 className="text-lg font-semibold mb-2">{t("transcription")}</h2>
                     <div className="space-y-3">
-                      <div>
-                        <h3 className="text-sm font-medium text-muted-foreground mb-1">Original:</h3>
-                        <p className="whitespace-pre-wrap text-sm leading-6 bg-muted/30 p-2 rounded">{result.transcription}</p>
-                      </div>
-                      {currentLang !== 'en' && (
                         <div>
-                          <h3 className="text-sm font-medium text-muted-foreground mb-1">
-                            {currentLang.toUpperCase()} Translation:
-                          </h3>
-                          {translations.transcription ? (
-                            <p className="whitespace-pre-wrap text-sm leading-6 bg-primary/10 p-2 rounded">
-                              {translations.transcription}
-                            </p>
-                          ) : (
-                            <p className="text-sm text-muted-foreground italic p-2">
-                              Translating...
-                            </p>
-                          )}
+                          <h3 className="text-sm font-medium text-muted-foreground mb-1">Original:</h3>
+                          <p className="whitespace-pre-wrap text-sm leading-6 bg-muted/30 p-2 rounded">{result.transcription}</p>
                         </div>
-                      )}
+                        {currentLang !== 'en' && (
+                          <div>
+                            <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                              {currentLang.toUpperCase()} Translation:
+                            </h3>
+                            {translating && !translations.transcription ? (
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground p-2">
+                                <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary"></div>
+                                <span>Translating transcription...</span>
+                              </div>
+                            ) : translations.transcription ? (
+                              <p className="whitespace-pre-wrap text-sm leading-6 bg-primary/10 p-2 rounded">
+                                {translations.transcription}
+                              </p>
+                            ) : (
+                              <p className="text-sm text-muted-foreground italic p-2">
+                                No translation available
+                              </p>
+                            )}
+                          </div>
+                        )}
                     </div>
                   </div>
                 )}
