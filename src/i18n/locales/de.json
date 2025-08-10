@@ -1,0 +1,32 @@
+{
+  "title": "Sprach-Betrugs-Schutz",
+  "subtitle": "Analysieren Sie Sprachnachrichten, um KI-generierte Stimmen und potenzielle Betrügereien mit fortschrittlicher Sprachanalyse zu erkennen.",
+  "uploadLabel": "Sprachnachrichten-Audio hochladen",
+  "selectedFile": "Ausgewählt: {{filename}} ({{size}} KB)",
+  "analyzeButton": "Sprachnachricht Analysieren",
+  "analyzingButton": "Analysiere...",
+  "resetButton": "Zurücksetzen",
+  "scamProbability": "Betrugswahrscheinlichkeit",
+  "voiceAnalysis": "Sprachanalyse",
+  "artificialVoiceDetected": "⚠️ Künstliche Stimme erkannt",
+  "naturalVoice": "✓ Natürliche Stimme",
+  "confidence": "Vertrauen: {{percent}}%",
+  "indicators": "Indikatoren:",
+  "transcription": "Transkription",
+  "rawResponse": "Rohe Antwort",
+  "analysisError": "Analysefehler",
+  "analysisErrorGeneric": "Etwas ist schiefgelaufen.",
+  "errorCode": "Code:",
+  "toast": {
+    "invalidFile": "Ungültige Datei",
+    "invalidFileDesc": "Bitte wählen Sie eine Audiodatei aus.",
+    "noFileSelected": "Keine Datei ausgewählt",
+    "noFileSelectedDesc": "Wählen Sie ein Sprachnachrichten-Audio zum Analysieren aus.",
+    "analysisComplete": "Analyse abgeschlossen",
+    "analysisCompleteDesc": "Transkription und Betrugswahrscheinlichkeit bereit.",
+    "analysisFailed": "Analyse fehlgeschlagen",
+    "unexpectedResponse": "Unerwartete Antwort",
+    "unexpectedResponseDesc": "Bitte versuchen Sie es erneut.",
+    "unexpectedError": "Unerwarteter Fehler"
+  }
+}

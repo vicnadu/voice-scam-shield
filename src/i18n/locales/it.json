@@ -1,0 +1,32 @@
+{
+  "title": "Scudo Anti-Truffa Vocale",
+  "subtitle": "Analizza i messaggi vocali per rilevare voci generate dall'IA e potenziali truffe utilizzando analisi vocali avanzate.",
+  "uploadLabel": "Carica audio messaggio vocale",
+  "selectedFile": "Selezionato: {{filename}} ({{size}} KB)",
+  "analyzeButton": "Analizza Messaggio Vocale",
+  "analyzingButton": "Analizzando...",
+  "resetButton": "Ripristina",
+  "scamProbability": "Probabilità di truffa",
+  "voiceAnalysis": "Analisi Vocale",
+  "artificialVoiceDetected": "⚠️ Voce artificiale rilevata",
+  "naturalVoice": "✓ Voce naturale",
+  "confidence": "Fiducia: {{percent}}%",
+  "indicators": "Indicatori:",
+  "transcription": "Trascrizione",
+  "rawResponse": "Risposta grezza",
+  "analysisError": "Errore di analisi",
+  "analysisErrorGeneric": "Qualcosa è andato storto.",
+  "errorCode": "Codice:",
+  "toast": {
+    "invalidFile": "File non valido",
+    "invalidFileDesc": "Seleziona un file audio.",
+    "noFileSelected": "Nessun file selezionato",
+    "noFileSelectedDesc": "Scegli un audio di messaggio vocale da analizzare.",
+    "analysisComplete": "Analisi completata",
+    "analysisCompleteDesc": "Trascrizione e probabilità di truffa pronte.",
+    "analysisFailed": "Analisi fallita",
+    "unexpectedResponse": "Risposta inaspettata",
+    "unexpectedResponseDesc": "Riprova.",
+    "unexpectedError": "Errore inaspettato"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "title": "Voice Scam Shield",
+  "subtitle": "Analyze voicemails to detect AI-generated voices and potential scams using advanced voice analysis.",
+  "uploadLabel": "Upload voicemail audio",
+  "selectedFile": "Selected: {{filename}} ({{size}} KB)",
+  "analyzeButton": "Analyze Voicemail",
+  "analyzingButton": "Analyzing...",
+  "resetButton": "Reset",
+  "scamProbability": "Scam probability",
+  "voiceAnalysis": "Voice Analysis",
+  "artificialVoiceDetected": "⚠️ Artificial voice detected",
+  "naturalVoice": "✓ Natural voice",
+  "confidence": "Confidence: {{percent}}%",
+  "indicators": "Indicators:",
+  "transcription": "Transcription",
+  "rawResponse": "Raw response",
+  "analysisError": "Analysis error",
+  "analysisErrorGeneric": "Something went wrong.",
+  "errorCode": "Code:",
+  "toast": {
+    "invalidFile": "Invalid file",
+    "invalidFileDesc": "Please select an audio file.",
+    "noFileSelected": "No file selected",
+    "noFileSelectedDesc": "Choose a voicemail audio to analyze.",
+    "analysisComplete": "Analysis complete",
+    "analysisCompleteDesc": "Transcription and scam probability ready.",
+    "analysisFailed": "Analysis failed",
+    "unexpectedResponse": "Unexpected response",
+    "unexpectedResponseDesc": "Please try again.",
+    "unexpectedError": "Unexpected error"
+  }
+}

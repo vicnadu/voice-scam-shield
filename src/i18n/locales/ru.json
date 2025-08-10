@@ -1,0 +1,32 @@
+{
+  "title": "Голосовой Щит от Мошенничества",
+  "subtitle": "Анализируйте голосовые сообщения для обнаружения голосов, созданных ИИ, и потенциальных мошеннических схем с помощью продвинутого анализа голоса.",
+  "uploadLabel": "Загрузить аудио голосового сообщения",
+  "selectedFile": "Выбрано: {{filename}} ({{size}} КБ)",
+  "analyzeButton": "Анализировать Голосовое Сообщение",
+  "analyzingButton": "Анализируется...",
+  "resetButton": "Сбросить",
+  "scamProbability": "Вероятность мошенничества",
+  "voiceAnalysis": "Анализ Голоса",
+  "artificialVoiceDetected": "⚠️ Обнаружен искусственный голос",
+  "naturalVoice": "✓ Естественный голос",
+  "confidence": "Уверенность: {{percent}}%",
+  "indicators": "Индикаторы:",
+  "transcription": "Транскрипция",
+  "rawResponse": "Необработанный ответ",
+  "analysisError": "Ошибка анализа",
+  "analysisErrorGeneric": "Что-то пошло не так.",
+  "errorCode": "Код:",
+  "toast": {
+    "invalidFile": "Недопустимый файл",
+    "invalidFileDesc": "Пожалуйста, выберите аудиофайл.",
+    "noFileSelected": "Файл не выбран",
+    "noFileSelectedDesc": "Выберите аудио голосового сообщения для анализа.",
+    "analysisComplete": "Анализ завершен",
+    "analysisCompleteDesc": "Транскрипция и вероятность мошенничества готовы.",
+    "analysisFailed": "Анализ не удался",
+    "unexpectedResponse": "Неожиданный ответ",
+    "unexpectedResponseDesc": "Попробуйте снова.",
+    "unexpectedError": "Неожиданная ошибка"
+  }
+}

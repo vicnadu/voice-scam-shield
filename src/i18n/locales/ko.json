@@ -1,0 +1,32 @@
+{
+  "title": "음성 사기 방패",
+  "subtitle": "고급 음성 분석을 사용하여 AI 생성 음성과 잠재적 사기를 탐지하기 위해 음성 메일을 분석합니다.",
+  "uploadLabel": "음성 메일 오디오 업로드",
+  "selectedFile": "선택됨: {{filename}} ({{size}} KB)",
+  "analyzeButton": "음성 메일 분석",
+  "analyzingButton": "분석 중...",
+  "resetButton": "재설정",
+  "scamProbability": "사기 확률",
+  "voiceAnalysis": "음성 분석",
+  "artificialVoiceDetected": "⚠️ 인공 음성 감지됨",
+  "naturalVoice": "✓ 자연스러운 음성",
+  "confidence": "신뢰도: {{percent}}%",
+  "indicators": "지표:",
+  "transcription": "전사",
+  "rawResponse": "원시 응답",
+  "analysisError": "분석 오류",
+  "analysisErrorGeneric": "문제가 발생했습니다.",
+  "errorCode": "코드:",
+  "toast": {
+    "invalidFile": "유효하지 않은 파일",
+    "invalidFileDesc": "오디오 파일을 선택해주세요.",
+    "noFileSelected": "파일이 선택되지 않음",
+    "noFileSelectedDesc": "분석할 음성 메일 오디오를 선택하세요.",
+    "analysisComplete": "분석 완료",
+    "analysisCompleteDesc": "전사 및 사기 확률이 준비되었습니다.",
+    "analysisFailed": "분석 실패",
+    "unexpectedResponse": "예상치 못한 응답",
+    "unexpectedResponseDesc": "다시 시도해주세요.",
+    "unexpectedError": "예상치 못한 오류"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "title": "音声詐欺シールド",
+  "subtitle": "高度な音声分析を使用して、AI生成音声と潜在的な詐欺を検出するためにボイスメールを分析します。",
+  "uploadLabel": "ボイスメール音声をアップロード",
+  "selectedFile": "選択済み: {{filename}} ({{size}} KB)",
+  "analyzeButton": "ボイスメールを分析",
+  "analyzingButton": "分析中...",
+  "resetButton": "リセット",
+  "scamProbability": "詐欺の確率",
+  "voiceAnalysis": "音声分析",
+  "artificialVoiceDetected": "⚠️ 人工音声を検出",
+  "naturalVoice": "✓ 自然な音声",
+  "confidence": "信頼度: {{percent}}%",
+  "indicators": "指標:",
+  "transcription": "転写",
+  "rawResponse": "生の応答",
+  "analysisError": "分析エラー",
+  "analysisErrorGeneric": "何かが間違っていました。",
+  "errorCode": "コード:",
+  "toast": {
+    "invalidFile": "無効なファイル",
+    "invalidFileDesc": "音声ファイルを選択してください。",
+    "noFileSelected": "ファイルが選択されていません",
+    "noFileSelectedDesc": "分析するボイスメール音声を選択してください。",
+    "analysisComplete": "分析完了",
+    "analysisCompleteDesc": "転写と詐欺確率の準備完了。",
+    "analysisFailed": "分析に失敗しました",
+    "unexpectedResponse": "予期しない応答",
+    "unexpectedResponseDesc": "再試行してください。",
+    "unexpectedError": "予期しないエラー"
+  }
+}

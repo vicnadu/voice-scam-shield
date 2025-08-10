@@ -1,0 +1,32 @@
+{
+  "title": "درع الحماية من الاحتيال الصوتي",
+  "subtitle": "تحليل الرسائل الصوتية لاكتشاف الأصوات المولدة بالذكاء الاصطناعي والاحتيال المحتمل باستخدام تحليل صوتي متقدم.",
+  "uploadLabel": "رفع صوت الرسالة الصوتية",
+  "selectedFile": "تم اختيار: {{filename}} ({{size}} كيلوبايت)",
+  "analyzeButton": "تحليل الرسالة الصوتية",
+  "analyzingButton": "جاري التحليل...",
+  "resetButton": "إعادة تعيين",
+  "scamProbability": "احتمالية الاحتيال",
+  "voiceAnalysis": "تحليل الصوت",
+  "artificialVoiceDetected": "⚠️ تم اكتشاف صوت اصطناعي",
+  "naturalVoice": "✓ صوت طبيعي",
+  "confidence": "الثقة: {{percent}}%",
+  "indicators": "المؤشرات:",
+  "transcription": "النسخ",
+  "rawResponse": "الاستجابة الخام",
+  "analysisError": "خطأ في التحليل",
+  "analysisErrorGeneric": "حدث خطأ ما.",
+  "errorCode": "الرمز:",
+  "toast": {
+    "invalidFile": "ملف غير صالح",
+    "invalidFileDesc": "يرجى اختيار ملف صوتي.",
+    "noFileSelected": "لم يتم اختيار ملف",
+    "noFileSelectedDesc": "اختر صوت رسالة صوتية للتحليل.",
+    "analysisComplete": "اكتمل التحليل",
+    "analysisCompleteDesc": "النسخ واحتمالية الاحتيال جاهزان.",
+    "analysisFailed": "فشل التحليل",
+    "unexpectedResponse": "استجابة غير متوقعة",
+    "unexpectedResponseDesc": "يرجى المحاولة مرة أخرى.",
+    "unexpectedError": "خطأ غير متوقع"
+  }
+}

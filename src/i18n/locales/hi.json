@@ -1,0 +1,32 @@
+{
+  "title": "वॉयस स्कैम शील्ड",
+  "subtitle": "उन्नत वॉयस एनालिसिस का उपयोग करके AI-जेनेरेटेड वॉयस और संभावित स्कैम का पता लगाने के लिए वॉयसमेल का विश्लेषण करें।",
+  "uploadLabel": "वॉयसमेल ऑडियो अपलोड करें",
+  "selectedFile": "चयनित: {{filename}} ({{size}} KB)",
+  "analyzeButton": "वॉयसमेल का विश्लेषण करें",
+  "analyzingButton": "विश्लेषण हो रहा है...",
+  "resetButton": "रीसेट",
+  "scamProbability": "स्कैम की संभावना",
+  "voiceAnalysis": "वॉयस एनालिसिस",
+  "artificialVoiceDetected": "⚠️ कृत्रिम आवाज का पता चला",
+  "naturalVoice": "✓ प्राकृतिक आवाज",
+  "confidence": "विश्वास: {{percent}}%",
+  "indicators": "संकेतक:",
+  "transcription": "ट्रांसक्रिप्शन",
+  "rawResponse": "कच्चा जवाब",
+  "analysisError": "विश्लेषण त्रुटि",
+  "analysisErrorGeneric": "कुछ गलत हुआ।",
+  "errorCode": "कोड:",
+  "toast": {
+    "invalidFile": "अमान्य फाइल",
+    "invalidFileDesc": "कृपया एक ऑडियो फाइल चुनें।",
+    "noFileSelected": "कोई फाइल चयनित नहीं",
+    "noFileSelectedDesc": "विश्लेषण के लिए वॉयसमेल ऑडियो चुनें।",
+    "analysisComplete": "विश्लेषण पूर्ण",
+    "analysisCompleteDesc": "ट्रांसक्रिप्शन और स्कैम संभावना तैयार।",
+    "analysisFailed": "विश्लेषण असफल",
+    "unexpectedResponse": "अप्रत्याशित प्रतिक्रिया",
+    "unexpectedResponseDesc": "कृपया पुनः प्रयास करें।",
+    "unexpectedError": "अप्रत्याशित त्रुटि"
+  }
+}

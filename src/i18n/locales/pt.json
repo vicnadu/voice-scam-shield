@@ -1,0 +1,32 @@
+{
+  "title": "Escudo Anti-Golpe de Voz",
+  "subtitle": "Analise mensagens de voz para detectar vozes geradas por IA e possíveis golpes usando análise avançada de voz.",
+  "uploadLabel": "Enviar áudio de mensagem de voz",
+  "selectedFile": "Selecionado: {{filename}} ({{size}} KB)",
+  "analyzeButton": "Analisar Mensagem de Voz",
+  "analyzingButton": "Analisando...",
+  "resetButton": "Reiniciar",
+  "scamProbability": "Probabilidade de golpe",
+  "voiceAnalysis": "Análise de Voz",
+  "artificialVoiceDetected": "⚠️ Voz artificial detectada",
+  "naturalVoice": "✓ Voz natural",
+  "confidence": "Confiança: {{percent}}%",
+  "indicators": "Indicadores:",
+  "transcription": "Transcrição",
+  "rawResponse": "Resposta bruta",
+  "analysisError": "Erro de análise",
+  "analysisErrorGeneric": "Algo deu errado.",
+  "errorCode": "Código:",
+  "toast": {
+    "invalidFile": "Arquivo inválido",
+    "invalidFileDesc": "Por favor selecione um arquivo de áudio.",
+    "noFileSelected": "Nenhum arquivo selecionado",
+    "noFileSelectedDesc": "Escolha um áudio de mensagem de voz para analisar.",
+    "analysisComplete": "Análise completa",
+    "analysisCompleteDesc": "Transcrição e probabilidade de golpe prontas.",
+    "analysisFailed": "Análise falhou",
+    "unexpectedResponse": "Resposta inesperada",
+    "unexpectedResponseDesc": "Tente novamente.",
+    "unexpectedError": "Erro inesperado"
+  }
+}

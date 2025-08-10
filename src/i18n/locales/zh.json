@@ -1,0 +1,32 @@
+{
+  "title": "语音诈骗盾",
+  "subtitle": "使用先进的语音分析技术分析语音邮件，检测AI生成的声音和潜在诈骗。",
+  "uploadLabel": "上传语音邮件音频",
+  "selectedFile": "已选择: {{filename}} ({{size}} KB)",
+  "analyzeButton": "分析语音邮件",
+  "analyzingButton": "分析中...",
+  "resetButton": "重置",
+  "scamProbability": "诈骗概率",
+  "voiceAnalysis": "语音分析",
+  "artificialVoiceDetected": "⚠️ 检测到人工语音",
+  "naturalVoice": "✓ 自然语音",
+  "confidence": "置信度: {{percent}}%",
+  "indicators": "指标:",
+  "transcription": "转录",
+  "rawResponse": "原始响应",
+  "analysisError": "分析错误",
+  "analysisErrorGeneric": "出现了问题。",
+  "errorCode": "代码:",
+  "toast": {
+    "invalidFile": "无效文件",
+    "invalidFileDesc": "请选择音频文件。",
+    "noFileSelected": "未选择文件",
+    "noFileSelectedDesc": "选择要分析的语音邮件音频。",
+    "analysisComplete": "分析完成",
+    "analysisCompleteDesc": "转录和诈骗概率已准备就绪。",
+    "analysisFailed": "分析失败",
+    "unexpectedResponse": "意外响应",
+    "unexpectedResponseDesc": "请重试。",
+    "unexpectedError": "意外错误"
+  }
+}

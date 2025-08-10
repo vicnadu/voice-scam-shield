@@ -1,0 +1,32 @@
+{
+  "title": "Escudo Anti-Estafas de Voz",
+  "subtitle": "Analiza mensajes de voz para detectar voces generadas por IA y posibles estafas usando análisis avanzado de voz.",
+  "uploadLabel": "Subir audio de mensaje de voz",
+  "selectedFile": "Seleccionado: {{filename}} ({{size}} KB)",
+  "analyzeButton": "Analizar Mensaje de Voz",
+  "analyzingButton": "Analizando...",
+  "resetButton": "Reiniciar",
+  "scamProbability": "Probabilidad de estafa",
+  "voiceAnalysis": "Análisis de Voz",
+  "artificialVoiceDetected": "⚠️ Voz artificial detectada",
+  "naturalVoice": "✓ Voz natural",
+  "confidence": "Confianza: {{percent}}%",
+  "indicators": "Indicadores:",
+  "transcription": "Transcripción",
+  "rawResponse": "Respuesta sin procesar",
+  "analysisError": "Error de análisis",
+  "analysisErrorGeneric": "Algo salió mal.",
+  "errorCode": "Código:",
+  "toast": {
+    "invalidFile": "Archivo inválido",
+    "invalidFileDesc": "Por favor selecciona un archivo de audio.",
+    "noFileSelected": "Ningún archivo seleccionado",
+    "noFileSelectedDesc": "Elige un audio de mensaje de voz para analizar.",
+    "analysisComplete": "Análisis completo",
+    "analysisCompleteDesc": "Transcripción y probabilidad de estafa listas.",
+    "analysisFailed": "Análisis falló",
+    "unexpectedResponse": "Respuesta inesperada",
+    "unexpectedResponseDesc": "Por favor inténtalo de nuevo.",
+    "unexpectedError": "Error inesperado"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "title": "Bouclier Anti-Arnaque Vocal",
+  "subtitle": "Analysez les messages vocaux pour détecter les voix générées par IA et les arnaques potentielles en utilisant une analyse vocale avancée.",
+  "uploadLabel": "Télécharger un audio de message vocal",
+  "selectedFile": "Sélectionné: {{filename}} ({{size}} KB)",
+  "analyzeButton": "Analyser le Message Vocal",
+  "analyzingButton": "Analyse en cours...",
+  "resetButton": "Réinitialiser",
+  "scamProbability": "Probabilité d'arnaque",
+  "voiceAnalysis": "Analyse Vocale",
+  "artificialVoiceDetected": "⚠️ Voix artificielle détectée",
+  "naturalVoice": "✓ Voix naturelle",
+  "confidence": "Confiance: {{percent}}%",
+  "indicators": "Indicateurs:",
+  "transcription": "Transcription",
+  "rawResponse": "Réponse brute",
+  "analysisError": "Erreur d'analyse",
+  "analysisErrorGeneric": "Quelque chose s'est mal passé.",
+  "errorCode": "Code:",
+  "toast": {
+    "invalidFile": "Fichier invalide",
+    "invalidFileDesc": "Veuillez sélectionner un fichier audio.",
+    "noFileSelected": "Aucun fichier sélectionné",
+    "noFileSelectedDesc": "Choisissez un audio de message vocal à analyser.",
+    "analysisComplete": "Analyse terminée",
+    "analysisCompleteDesc": "Transcription et probabilité d'arnaque prêtes.",
+    "analysisFailed": "Échec de l'analyse",
+    "unexpectedResponse": "Réponse inattendue",
+    "unexpectedResponseDesc": "Veuillez réessayer.",
+    "unexpectedError": "Erreur inattendue"
+  }
+}
