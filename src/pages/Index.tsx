@@ -103,6 +103,38 @@ const Index = () => {
                   </div>
                 )}
 
+                {result?.voice_analysis && (
+                  <div className="rounded-md border border-input p-4">
+                    <h2 className="text-lg font-semibold mb-2">Voice Analysis</h2>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`inline-block w-3 h-3 rounded-full ${result.voice_analysis.sounds_artificial ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                        <span className="text-sm font-medium">
+                          {result.voice_analysis.sounds_artificial ? '⚠️ Artificial voice detected' : '✓ Natural voice'}
+                        </span>
+                      </div>
+                      {result.voice_analysis.confidence > 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          Confidence: {Math.round(result.voice_analysis.confidence * 100)}%
+                        </p>
+                      )}
+                      {result.voice_analysis.description && (
+                        <p className="text-sm text-muted-foreground">{result.voice_analysis.description}</p>
+                      )}
+                      {Array.isArray(result.voice_analysis.indicators) && result.voice_analysis.indicators.length > 0 && (
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground mb-1">Indicators:</p>
+                          <ul className="list-disc pl-5 text-sm text-muted-foreground">
+                            {result.voice_analysis.indicators.map((indicator: string, idx: number) => (
+                              <li key={idx}>{indicator}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 {typeof result?.transcription === "string" && result.transcription && (
                   <div className="rounded-md border border-input p-4">
                     <h2 className="text-lg font-semibold mb-2">Transcription</h2>

@@ -37,18 +37,41 @@ function labelFromProbability(p: number) {
   return "uncertain" as const;
 }
 
-async function transcribeWithGemini(audioBase64: string, filename = "audio.webm", mimeType = "audio/webm") {
+async function analyzeAudioWithGemini(audioBase64: string, filename = "audio.webm", mimeType = "audio/webm") {
   const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
   if (!geminiApiKey) throw new Error("Missing GEMINI_API_KEY secret");
 
-  // Use Gemini 2.0 Flash with audio input for transcription
+  // Use Gemini 2.0 Flash with audio input for both transcription and voice analysis
   const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${geminiApiKey}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       contents: [{
         parts: [
-          { text: "Please transcribe this audio file accurately. Return only the transcript text without any additional formatting or commentary." },
+          { 
+            text: `Analyze this audio file and provide both transcription and voice characteristics analysis.
+
+TASK 1: Transcribe the audio accurately.
+
+TASK 2: Analyze the voice characteristics to detect if it sounds:
+- Robotic or artificially generated
+- Text-to-speech (TTS) or synthetic
+- Unnatural speech patterns
+- Poor audio quality typical of robocalls
+
+Return your response in this JSON format:
+{
+  "transcript": "exact transcription here",
+  "voice_analysis": {
+    "sounds_artificial": true/false,
+    "confidence": 0.85,
+    "indicators": ["specific indicators found"],
+    "description": "brief description of voice characteristics"
+  }
+}
+
+Focus on detecting synthetic speech, robotic voices, and artificial generation patterns.` 
+          },
           {
             inline_data: {
               mime_type: mimeType || "audio/webm",
@@ -58,25 +81,56 @@ async function transcribeWithGemini(audioBase64: string, filename = "audio.webm"
         ]
       }],
       generationConfig: {
-        temperature: 0,
+        temperature: 0.1,
         topK: 1,
         topP: 0.8,
-        maxOutputTokens: 1000,
+        maxOutputTokens: 1500,
       }
     }),
   });
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`Gemini transcription error: ${errText}`);
+    throw new Error(`Gemini audio analysis error: ${errText}`);
   }
 
   const result = await response.json();
-  const transcript = result?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-  return transcript.trim();
+  let content = result?.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  
+  // Clean up the response - extract JSON if wrapped in markdown
+  content = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
+  
+  try {
+    const analysis = JSON.parse(content);
+    return {
+      transcript: analysis.transcript || "",
+      voiceAnalysis: analysis.voice_analysis || {
+        sounds_artificial: false,
+        confidence: 0.0,
+        indicators: [],
+        description: "No voice analysis available"
+      }
+    };
+  } catch (parseError) {
+    console.log("JSON parse failed for audio analysis:", { parseError, content });
+    // Fallback: extract transcript manually if possible
+    const lines = content.split('\n');
+    const transcriptLine = lines.find(line => line.includes('transcript') || line.includes('Transcript'));
+    const transcript = transcriptLine ? transcriptLine.replace(/[^a-zA-Z0-9\s]/g, '').trim() : content.trim();
+    
+    return {
+      transcript,
+      voiceAnalysis: {
+        sounds_artificial: false,
+        confidence: 0.0,
+        indicators: ["Analysis format error"],
+        description: "Voice analysis unavailable due to parsing error"
+      }
+    };
+  }
 }
 
-async function scamProbabilityWithGemini(transcript: string) {
+async function scamProbabilityWithGemini(transcript: string, voiceAnalysis?: any) {
   const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
   if (!geminiApiKey) throw new Error("Missing GEMINI_API_KEY secret");
 
@@ -85,9 +139,18 @@ async function scamProbabilityWithGemini(transcript: string) {
     return { probability: 0.0, reasons: ["No speech content detected"], label: labelFromProbability(0.0) } as const;
   }
 
+  let voiceContext = "";
+  if (voiceAnalysis) {
+    voiceContext = `\n\nVOICE ANALYSIS CONTEXT:
+- Sounds artificial/robotic: ${voiceAnalysis.sounds_artificial}
+- Voice confidence: ${voiceAnalysis.confidence}
+- Voice indicators: ${voiceAnalysis.indicators?.join(', ') || 'None'}
+- Voice description: ${voiceAnalysis.description}`;
+  }
+
   const prompt = `You are a cybersecurity expert analyzing voicemails for scam indicators. Analyze this transcript and provide a scam probability score.
 
-TRANSCRIPT: "${transcript}"
+TRANSCRIPT: "${transcript}"${voiceContext}
 
 SCAM INDICATORS TO LOOK FOR:
 - Urgent threats (account closure, legal action, arrest)
@@ -97,6 +160,7 @@ SCAM INDICATORS TO LOOK FOR:
 - Payment demands (gift cards, wire transfers, cryptocurrency)
 - Verification code requests
 - Suspicious caller behavior (robotic voice, background noise)
+- Artificial/synthetic voice patterns (if voice analysis indicates)
 
 RESPONSE FORMAT (JSON only, no other text):
 {
@@ -108,6 +172,8 @@ Probability scale:
 - 0.0-0.2: Legitimate call
 - 0.3-0.6: Suspicious elements  
 - 0.7-1.0: Likely scam
+
+Note: If voice analysis indicates artificial/robotic speech, consider this as an additional scam indicator.
 
 Analyze now:`;
 
@@ -193,21 +259,22 @@ serve(async (req: Request) => {
 
     const meta = { filename: filename ?? null, mimeType: mimeType ?? null, size: size ?? null };
 
-    // 1) Transcribe
+    // 1) Analyze audio (transcription + voice characteristics)
     const startedAt = Date.now();
-    const transcription = await transcribeWithGemini(audio, filename, mimeType);
+    const audioAnalysis = await analyzeAudioWithGemini(audio, filename, mimeType);
 
-    // 2) Content-based scam probability with Gemini
-    const scam = await scamProbabilityWithGemini(transcription);
+    // 2) Content-based scam probability with voice analysis context
+    const scam = await scamProbabilityWithGemini(audioAnalysis.transcript, audioAnalysis.voiceAnalysis);
     const durationMs = Date.now() - startedAt;
 
     const responseBody = {
       status: "ok",
-      transcription,
+      transcription: audioAnalysis.transcript,
+      voice_analysis: audioAnalysis.voiceAnalysis,
       scam,
       metadata: meta,
       processing_ms: durationMs,
-      version: "0.2.0",
+      version: "0.3.0",
     } as const;
 
     return new Response(JSON.stringify(responseBody), {
