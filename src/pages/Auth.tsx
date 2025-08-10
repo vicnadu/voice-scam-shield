@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,6 +14,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function Auth() {
+  const { t } = useTranslation();
   const { signIn, signUp, user, continueAsGuest } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -38,9 +40,9 @@ export default function Auth() {
     
     if (error) {
       setError(error.message);
-      toast.error("Sign in failed: " + error.message);
+      toast.error(t("auth.signInFailed", { error: error.message }));
     } else {
-      toast.success("Welcome back!");
+      toast.success(t("auth.welcomeBack"));
       navigate("/");
     }
     
@@ -61,9 +63,9 @@ export default function Auth() {
     
     if (error) {
       setError(error.message);
-      toast.error("Sign up failed: " + error.message);
+      toast.error(t("auth.signUpFailed", { error: error.message }));
     } else {
-      toast.success("Account created! Please check your email to verify your account.");
+      toast.success(t("auth.accountCreated"));
     }
     
     setLoading(false);
@@ -82,38 +84,38 @@ export default function Auth() {
       </div>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">VoiceTranscribe</CardTitle>
+          <CardTitle className="text-2xl font-bold">{t("auth.appTitle")}</CardTitle>
           <CardDescription>
-            Sign in to your account or create a new one
+            {t("auth.appDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin">{t("auth.signIn")}</TabsTrigger>
+              <TabsTrigger value="signup">{t("auth.signUp")}</TabsTrigger>
             </TabsList>
             
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="signin-email">{t("auth.email")}</Label>
                   <Input
                     id="signin-email"
                     name="email"
                     type="email"
                     required
-                    placeholder="Enter your email"
+                    placeholder={t("auth.emailPlaceholder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signin-password">Password</Label>
+                  <Label htmlFor="signin-password">{t("auth.password")}</Label>
                   <Input
                     id="signin-password"
                     name="password"
                     type="password"
                     required
-                    placeholder="Enter your password"
+                    placeholder={t("auth.passwordPlaceholder")}
                   />
                 </div>
                 {error && (
@@ -122,7 +124,7 @@ export default function Auth() {
                   </Alert>
                 )}
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Signing in..." : "Sign In"}
+                  {loading ? t("auth.signingIn") : t("auth.signIn")}
                 </Button>
               </form>
             </TabsContent>
@@ -130,32 +132,32 @@ export default function Auth() {
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Display Name</Label>
+                  <Label htmlFor="signup-name">{t("auth.displayName")}</Label>
                   <Input
                     id="signup-name"
                     name="displayName"
                     type="text"
-                    placeholder="Enter your display name"
+                    placeholder={t("auth.displayNamePlaceholder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">{t("auth.email")}</Label>
                   <Input
                     id="signup-email"
                     name="email"
                     type="email"
                     required
-                    placeholder="Enter your email"
+                    placeholder={t("auth.emailPlaceholder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">{t("auth.password")}</Label>
                   <Input
                     id="signup-password"
                     name="password"
                     type="password"
                     required
-                    placeholder="Create a password"
+                    placeholder={t("auth.createPasswordPlaceholder")}
                     minLength={6}
                   />
                 </div>
@@ -165,7 +167,7 @@ export default function Auth() {
                   </Alert>
                 )}
                 <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? "Creating account..." : "Sign Up"}
+                  {loading ? t("auth.creatingAccount") : t("auth.signUp")}
                 </Button>
               </form>
             </TabsContent>
@@ -177,7 +179,7 @@ export default function Auth() {
                 <span className="w-full border-t" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or</span>
+                <span className="bg-background px-2 text-muted-foreground">{t("auth.or")}</span>
               </div>
             </div>
             <Button 
@@ -185,10 +187,10 @@ export default function Auth() {
               className="w-full mt-4" 
               onClick={handleGuestContinue}
             >
-              Continue as Guest
+              {t("auth.continueAsGuest")}
             </Button>
             <p className="text-xs text-muted-foreground mt-2">
-              Guest mode stores analysis history locally (last 10 analyses)
+              {t("auth.guestModeDescription")}
             </p>
           </div>
         </CardContent>
