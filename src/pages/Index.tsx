@@ -307,7 +307,7 @@ const Index = () => {
             </TabsTrigger>
             <TabsTrigger value="history" className="flex items-center gap-2">
               <History className="h-4 w-4" />
-              {t("history")}
+              {t("historyTab")}
             </TabsTrigger>
           </TabsList>
 

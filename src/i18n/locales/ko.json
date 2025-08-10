@@ -18,7 +18,7 @@
   "analysisErrorGeneric": "분석 중 오류가 발생했습니다",
   "errorCode": "오류 코드:",
   "newAnalysis": "새 분석",
-  "history": "기록",
+  "historyTab": "기록",
   "guestUser": "게스트 사용자",
   "createAccount": "계정 생성",
   "signOut": "로그아웃",
