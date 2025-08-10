@@ -11,7 +11,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 
 export default function Auth() {
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, continueAsGuest } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -65,6 +65,11 @@ export default function Auth() {
     }
     
     setLoading(false);
+  };
+
+  const handleGuestContinue = () => {
+    continueAsGuest();
+    navigate("/");
   };
 
   return (
@@ -159,6 +164,27 @@ export default function Auth() {
               </form>
             </TabsContent>
           </Tabs>
+          
+          <div className="mt-6 text-center">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">Or</span>
+              </div>
+            </div>
+            <Button 
+              variant="outline" 
+              className="w-full mt-4" 
+              onClick={handleGuestContinue}
+            >
+              Continue as Guest
+            </Button>
+            <p className="text-xs text-muted-foreground mt-2">
+              Guest mode stores analysis history locally (last 10 analyses)
+            </p>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -13,7 +13,7 @@ import { LogOut, User } from "lucide-react";
 
 const Index = () => {
   const { t, i18n } = useTranslation();
-  const { user, signOut, loading: authLoading } = useAuth();
+  const { user, signOut, loading: authLoading, isGuest } = useAuth();
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<any>(null);
@@ -27,12 +27,12 @@ const Index = () => {
   }>({});
   const [translating, setTranslating] = useState(false);
 
-  // Redirect to auth if not authenticated
+  // Redirect to auth if not authenticated and not guest
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (!authLoading && !user && !isGuest) {
       navigate("/auth");
     }
-  }, [user, authLoading, navigate]);
+  }, [user, authLoading, isGuest, navigate]);
 
   // Language mapping for translation API
   const getLanguageCode = (langCode: string) => {
@@ -238,8 +238,8 @@ const Index = () => {
     );
   }
 
-  // Don't render if user is not authenticated (will redirect)
-  if (!user) {
+  // Don't render if user is not authenticated and not guest (will redirect)
+  if (!user && !isGuest) {
     return null;
   }
 
@@ -250,19 +250,31 @@ const Index = () => {
           <div className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span className="text-sm text-muted-foreground">
-              {user.email}
+              {isGuest ? "Guest User" : user?.email}
             </span>
+            {isGuest && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/auth")}
+                className="text-xs text-primary hover:text-primary/80"
+              >
+                Create Account
+              </Button>
+            )}
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={signOut}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <LogOut className="h-4 w-4 mr-1" />
-              Sign Out
-            </Button>
+            {!isGuest && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={signOut}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <LogOut className="h-4 w-4 mr-1" />
+                Sign Out
+              </Button>
+            )}
             <ThemeToggle />
             <LanguageSwitcher />
           </div>
