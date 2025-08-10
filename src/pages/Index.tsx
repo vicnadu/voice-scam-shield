@@ -53,7 +53,7 @@ const Index = () => {
       <section className="container mx-auto max-w-2xl px-4 py-16">
         <header className="mb-8 text-center">
           <h1 className="text-4xl font-bold tracking-tight mb-2">Voice Scam Shield</h1>
-          <p className="text-muted-foreground">Analyze voicemails to detect AI-generated voices and potential scams.</p>
+          <p className="text-muted-foreground">Analyze voicemails to detect AI-generated voices and potential scams using advanced voice analysis.</p>
         </header>
 
         <article className="rounded-lg border border-input bg-card p-6 shadow-sm">
