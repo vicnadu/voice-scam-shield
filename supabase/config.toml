@@ -1,4 +1,1 @@
 project_id = "bljwbhaudmupnfdxulky"
-
-[functions.translate]
-verify_jwt = false
