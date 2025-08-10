@@ -232,7 +232,7 @@ const Index = () => {
                     {Array.isArray(result?.scam?.reasons) && result.scam.reasons.length > 0 && (
                       <div className="mt-2">
                         <h3 className="text-sm font-medium mb-1">{t("indicators")}</h3>
-                        {translating && currentLang !== 'en' ? (
+                        {translating && currentLang !== 'en' && (!translations.reasons || translations.reasons.length === 0) ? (
                           <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-primary"></div>
                             <span>Translating...</span>
