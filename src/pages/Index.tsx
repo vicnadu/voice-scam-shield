@@ -62,7 +62,10 @@ const Index = () => {
     const newTranslations: { transcription?: string; reasons?: string[]; voiceIndicators?: string[]; voiceDescription?: string } = {};
 
     try {
-      // Translate transcription
+      // Helper function to add delay between requests
+      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+      // Translate transcription first
       if (result.transcription) {
         console.log('📝 Translating transcription...');
         const { data: transcriptionData, error: transcriptionError } = await translateText(result.transcription, targetLang);
@@ -71,58 +74,78 @@ const Index = () => {
           console.error('❌ Transcription translation error:', transcriptionError);
         } else if (transcriptionData?.translatedText) {
           newTranslations.transcription = transcriptionData.translatedText;
-          console.log('✅ Transcription translated successfully:', newTranslations.transcription);
+          console.log('✅ Transcription translated successfully');
         }
+        await delay(1000); // Wait 1 second before next request
       }
 
-      // Translate scam reasons
+      // Translate scam reasons sequentially with delays
       if (result.scam?.reasons && Array.isArray(result.scam.reasons)) {
         console.log('🔍 Translating scam reasons...');
-        console.log('🔍 Reasons to translate:', result.scam.reasons);
-        const reasonPromises = result.scam.reasons.map(async (reason: string, index: number) => {
-          console.log(`🔍 Translating reason ${index + 1}:`, reason);
-          const { data, error } = await translateText(reason, targetLang);
-          console.log(`🔍 Reason ${index + 1} result:`, { data, error });
-          if (error) {
-            console.error(`❌ Error translating reason ${index + 1}:`, error);
-            return null;
-          }
-          return data?.translatedText;
-        });
+        const translatedReasons: string[] = [];
         
-        const reasonResults = await Promise.all(reasonPromises);
-        newTranslations.reasons = reasonResults.filter(Boolean);
+        for (let i = 0; i < result.scam.reasons.length; i++) {
+          const reason = result.scam.reasons[i];
+          console.log(`🔍 Translating reason ${i + 1}:`, reason);
+          
+          const { data, error } = await translateText(reason, targetLang);
+          console.log(`🔍 Reason ${i + 1} result:`, { data, error });
+          
+          if (error) {
+            console.error(`❌ Error translating reason ${i + 1}:`, error);
+          } else if (data?.translatedText) {
+            translatedReasons.push(data.translatedText);
+          }
+          
+          // Add delay between requests (except after the last one)
+          if (i < result.scam.reasons.length - 1) {
+            await delay(800);
+          }
+        }
+        
+        newTranslations.reasons = translatedReasons;
         console.log('✅ Reasons translated:', newTranslations.reasons);
+        await delay(1000);
       }
 
       // Translate voice analysis description
       if (result.voice_analysis?.description) {
-        console.log('Translating voice description...');
+        console.log('🎤 Translating voice description...');
         const { data: descriptionData, error: descriptionError } = await translateText(result.voice_analysis.description, targetLang);
         if (descriptionError) {
-          console.error('Voice description translation error:', descriptionError);
+          console.error('❌ Voice description translation error:', descriptionError);
         } else if (descriptionData?.translatedText) {
           newTranslations.voiceDescription = descriptionData.translatedText;
-          console.log('Voice description translated successfully');
+          console.log('✅ Voice description translated successfully');
         }
+        await delay(1000);
       }
 
-      // Translate voice analysis indicators
+      // Translate voice analysis indicators sequentially with delays
       if (result.voice_analysis?.indicators && Array.isArray(result.voice_analysis.indicators)) {
-        console.log('Translating voice indicators...');
-        const indicatorPromises = result.voice_analysis.indicators.map(async (indicator: string, index: number) => {
-          console.log(`Translating voice indicator ${index + 1}:`, indicator);
-          const { data, error } = await translateText(indicator, targetLang);
-          if (error) {
-            console.error(`Error translating voice indicator ${index + 1}:`, error);
-            return null;
-          }
-          return data?.translatedText;
-        });
+        console.log('🎯 Translating voice indicators...');
+        const translatedIndicators: string[] = [];
         
-        const indicatorResults = await Promise.all(indicatorPromises);
-        newTranslations.voiceIndicators = indicatorResults.filter(Boolean);
-        console.log('Voice indicators translated:', newTranslations.voiceIndicators);
+        for (let i = 0; i < result.voice_analysis.indicators.length; i++) {
+          const indicator = result.voice_analysis.indicators[i];
+          console.log(`🎯 Translating voice indicator ${i + 1}:`, indicator);
+          
+          const { data, error } = await translateText(indicator, targetLang);
+          
+          if (error) {
+            console.error(`❌ Error translating voice indicator ${i + 1}:`, error);
+          } else if (data?.translatedText) {
+            translatedIndicators.push(data.translatedText);
+          }
+          
+          // Add delay between requests (except after the last one)
+          if (i < result.voice_analysis.indicators.length - 1) {
+            await delay(800);
+          }
+        }
+        
+        newTranslations.voiceIndicators = translatedIndicators;
+        console.log('✅ Voice indicators translated:', newTranslations.voiceIndicators);
       }
 
       console.log('🎯 Final translations object:', newTranslations);
