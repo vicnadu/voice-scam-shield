@@ -202,7 +202,12 @@ export const HistoryTab = () => {
                        <p className="text-sm line-clamp-2">
                          {item.analysis_result.transcription}
                        </p>
-                       <Button variant="ghost" size="sm" className="mt-2 p-0 h-auto text-xs text-primary">
+                       <Button 
+                         variant="ghost" 
+                         size="sm" 
+                         className="mt-2 p-0 h-auto text-xs text-primary hover:underline"
+                         onClick={() => toggleExpanded(item.id)}
+                       >
                          {t("history.clickToViewFull")}
                        </Button>
                      </div>
