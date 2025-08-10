@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/hooks/use-toast";
 import { analyzeAudio } from "@/services/analyze";
-import { translateText } from "@/services/translate";
+import { translateText, batchTranslateTexts } from "@/services/translate";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -56,121 +56,108 @@ const Index = () => {
   const translateContent = async () => {
     if (!result || i18n.language === 'en') return;
 
-    console.log('🚀 Starting translation process...');
+    console.log('🚀 Starting efficient translation process...');
     console.log('🌍 Target language:', i18n.language);
-    console.log('📊 Result data:', result);
     setTranslating(true);
     const targetLang = getLanguageCode(i18n.language);
     const newTranslations: { transcription?: string; reasons?: string[]; voiceIndicators?: string[]; voiceDescription?: string; scamLabel?: string; } = {};
 
     try {
-      // Helper function to add delay between requests
-      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+      // Collect all texts that need translation
+      const textsToTranslate: string[] = [];
+      const textMapping: { type: string; index?: number; originalText: string }[] = [];
 
-      // Translate transcription first
+      // Add transcription
       if (result.transcription) {
-        console.log('📝 Translating transcription...');
-        const { data: transcriptionData, error: transcriptionError } = await translateText(result.transcription, targetLang);
-        console.log('📝 Transcription result:', { data: transcriptionData, error: transcriptionError });
-        if (transcriptionError) {
-          console.error('❌ Transcription translation error:', transcriptionError);
-          newTranslations.transcription = result.transcription; // Use original text as fallback
-        } else if (transcriptionData?.translatedText) {
-          newTranslations.transcription = transcriptionData.translatedText;
-          console.log('✅ Transcription translated successfully');
-        }
-        await delay(1000); // Wait 1 second before next request
+        textsToTranslate.push(result.transcription);
+        textMapping.push({ type: 'transcription', originalText: result.transcription });
       }
 
-      // Translate scam label if it exists
+      // Add scam label
       if (result?.scam?.label) {
-        console.log('🏷️ Translating scam label:', result.scam.label);
-        const { data: labelData, error: labelError } = await translateText(result.scam.label.replace("_", " "), targetLang);
-        if (labelError) {
-          console.error('❌ Scam label translation error:', labelError);
-          newTranslations.scamLabel = result.scam.label.replace("_", " "); // Use original text as fallback
-        } else if (labelData?.translatedText) {
-          newTranslations.scamLabel = labelData.translatedText;
-          console.log('✅ Scam label translated successfully');
-        }
-        await delay(1000);
+        const labelText = result.scam.label.replace("_", " ");
+        textsToTranslate.push(labelText);
+        textMapping.push({ type: 'scamLabel', originalText: labelText });
       }
 
-      // Translate scam reasons sequentially with delays
+      // Add scam reasons
       if (result.scam?.reasons && Array.isArray(result.scam.reasons)) {
-        console.log('🔍 Translating scam reasons...');
-        const translatedReasons: string[] = [];
-        
-        for (let i = 0; i < result.scam.reasons.length; i++) {
-          const reason = result.scam.reasons[i];
-          console.log(`🔍 Translating reason ${i + 1}:`, reason);
-          
-          const { data, error } = await translateText(reason, targetLang);
-          console.log(`🔍 Reason ${i + 1} result:`, { data, error });
-          
-          if (error) {
-            console.error(`❌ Error translating reason ${i + 1}:`, error);
-            translatedReasons.push(reason); // Use original text as fallback
-          } else if (data?.translatedText) {
-            translatedReasons.push(data.translatedText);
-          }
-          
-          // Add delay between requests (except after the last one)
-          if (i < result.scam.reasons.length - 1) {
-            await delay(800);
-          }
-        }
-        
-        newTranslations.reasons = translatedReasons;
-        console.log('✅ Reasons translated:', newTranslations.reasons);
-        await delay(1000);
+        result.scam.reasons.forEach((reason, index) => {
+          textsToTranslate.push(reason);
+          textMapping.push({ type: 'reasons', index, originalText: reason });
+        });
       }
 
-      // Translate voice analysis description
+      // Add voice description
       if (result.voice_analysis?.description) {
-        console.log('🎤 Translating voice description...');
-        const { data: descriptionData, error: descriptionError } = await translateText(result.voice_analysis.description, targetLang);
-        if (descriptionError) {
-          console.error('❌ Voice description translation error:', descriptionError);
-          newTranslations.voiceDescription = result.voice_analysis.description; // Use original text as fallback
-        } else if (descriptionData?.translatedText) {
-          newTranslations.voiceDescription = descriptionData.translatedText;
-          console.log('✅ Voice description translated successfully');
-        }
-        await delay(1000);
+        textsToTranslate.push(result.voice_analysis.description);
+        textMapping.push({ type: 'voiceDescription', originalText: result.voice_analysis.description });
       }
 
-      // Translate voice analysis indicators sequentially with delays
+      // Add voice indicators
       if (result.voice_analysis?.indicators && Array.isArray(result.voice_analysis.indicators)) {
-        console.log('🎯 Translating voice indicators...');
-        const translatedIndicators: string[] = [];
-        
-        for (let i = 0; i < result.voice_analysis.indicators.length; i++) {
-          const indicator = result.voice_analysis.indicators[i];
-          console.log(`🎯 Translating voice indicator ${i + 1}:`, indicator);
-          
-          const { data, error } = await translateText(indicator, targetLang);
-          
-          if (error) {
-            console.error(`❌ Error translating voice indicator ${i + 1}:`, error);
-            translatedIndicators.push(indicator); // Use original text as fallback
-          } else if (data?.translatedText) {
-            translatedIndicators.push(data.translatedText);
+        result.voice_analysis.indicators.forEach((indicator, index) => {
+          textsToTranslate.push(indicator);
+          textMapping.push({ type: 'voiceIndicators', index, originalText: indicator });
+        });
+      }
+
+      if (textsToTranslate.length === 0) {
+        console.log('No texts to translate');
+        setTranslating(false);
+        return;
+      }
+
+      console.log(`🔄 Batch translating ${textsToTranslate.length} texts in one request...`);
+
+      // Use batch translation API
+      const { data: batchData, error: batchError } = await batchTranslateTexts(textsToTranslate, targetLang);
+
+      if (batchError) {
+        console.error('❌ Batch translation error:', batchError);
+        // Fallback to original texts
+        textMapping.forEach((mapping) => {
+          if (mapping.type === 'transcription') {
+            newTranslations.transcription = mapping.originalText;
+          } else if (mapping.type === 'scamLabel') {
+            newTranslations.scamLabel = mapping.originalText;
+          } else if (mapping.type === 'reasons') {
+            if (!newTranslations.reasons) newTranslations.reasons = [];
+            newTranslations.reasons[mapping.index!] = mapping.originalText;
+          } else if (mapping.type === 'voiceDescription') {
+            newTranslations.voiceDescription = mapping.originalText;
+          } else if (mapping.type === 'voiceIndicators') {
+            if (!newTranslations.voiceIndicators) newTranslations.voiceIndicators = [];
+            newTranslations.voiceIndicators[mapping.index!] = mapping.originalText;
           }
-          
-          // Add delay between requests (except after the last one)
-          if (i < result.voice_analysis.indicators.length - 1) {
-            await delay(800);
-          }
-        }
+        });
+      } else if (batchData?.translations) {
+        console.log('✅ Batch translation successful');
         
-        newTranslations.voiceIndicators = translatedIndicators;
-        console.log('✅ Voice indicators translated:', newTranslations.voiceIndicators);
+        // Map the results back to their respective fields
+        batchData.translations.forEach((translationResult: any, index: number) => {
+          const mapping = textMapping[index];
+          const translatedText = translationResult.translatedText || mapping.originalText;
+
+          if (mapping.type === 'transcription') {
+            newTranslations.transcription = translatedText;
+          } else if (mapping.type === 'scamLabel') {
+            newTranslations.scamLabel = translatedText;
+          } else if (mapping.type === 'reasons') {
+            if (!newTranslations.reasons) newTranslations.reasons = [];
+            newTranslations.reasons[mapping.index!] = translatedText;
+          } else if (mapping.type === 'voiceDescription') {
+            newTranslations.voiceDescription = translatedText;
+          } else if (mapping.type === 'voiceIndicators') {
+            if (!newTranslations.voiceIndicators) newTranslations.voiceIndicators = [];
+            newTranslations.voiceIndicators[mapping.index!] = translatedText;
+          }
+        });
       }
 
       console.log('🎯 Final translations object:', newTranslations);
       setTranslations(newTranslations);
-      console.log('✅ Translations set successfully');
+      console.log('✅ Translations completed successfully');
     } catch (error) {
       console.error('Translation error:', error);
       toast({ 

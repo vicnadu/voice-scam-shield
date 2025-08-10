@@ -14,3 +14,18 @@ export async function translateText(text: string, targetLanguage: string, source
   console.log('🌐 Translation service response:', { data, error });
   return { data, error };
 }
+
+export async function batchTranslateTexts(texts: string[], targetLanguage: string, sourceLanguage: string = 'auto') {
+  console.log('🌐 Batch translation service called:', { textCount: texts.length, targetLanguage, sourceLanguage });
+  
+  const { data, error } = await supabase.functions.invoke("translate", {
+    body: {
+      texts,
+      targetLanguage,
+      sourceLanguage,
+    },
+  });
+
+  console.log('🌐 Batch translation service response:', { data, error });
+  return { data, error };
+}
