@@ -7,9 +7,14 @@ import { analyzeAudio } from "@/services/analyze";
 import { translateText, batchTranslateTexts } from "@/services/translate";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate, Link } from "react-router-dom";
+import { LogOut, User } from "lucide-react";
 
 const Index = () => {
   const { t, i18n } = useTranslation();
+  const { user, signOut, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -21,6 +26,13 @@ const Index = () => {
     scamLabel?: string;
   }>({});
   const [translating, setTranslating] = useState(false);
+
+  // Redirect to auth if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/auth");
+    }
+  }, [user, authLoading, navigate]);
 
   // Language mapping for translation API
   const getLanguageCode = (langCode: string) => {
@@ -217,12 +229,43 @@ const Index = () => {
   const scamLabel = result?.scam?.label as string | undefined;
   const currentLang = i18n.language;
 
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Don't render if user is not authenticated (will redirect)
+  if (!user) {
+    return null;
+  }
+
   return (
     <main className="min-h-screen bg-background text-foreground">
       <section className="container mx-auto max-w-2xl px-4 py-16">
-        <div className="flex justify-end items-center gap-2 mb-4">
-          <ThemeToggle />
-          <LanguageSwitcher />
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex items-center gap-2">
+            <User className="h-4 w-4" />
+            <span className="text-sm text-muted-foreground">
+              {user.email}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={signOut}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4 mr-1" />
+              Sign Out
+            </Button>
+            <ThemeToggle />
+            <LanguageSwitcher />
+          </div>
         </div>
         <header className="mb-8 text-center">
           <h1 className="text-4xl font-bold tracking-tight mb-2">{t("title")}</h1>
