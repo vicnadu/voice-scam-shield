@@ -13,6 +13,8 @@
   "confidence": "Confidence: {{percent}}%",
   "indicators": "Indicators:",
   "transcription": "Transcription",
+  "originalText": "Original",
+  "translatedText": "Translated",
   "rawResponse": "Raw response",
   "analysisError": "Analysis error",
   "analysisErrorGeneric": "Something went wrong.",

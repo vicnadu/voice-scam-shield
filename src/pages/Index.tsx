@@ -1,16 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/use-toast";
 import { analyzeAudio } from "@/services/analyze";
+import { translateText } from "@/services/translate";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const Index = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [translations, setTranslations] = useState<{
+    transcription?: string;
+    reasons?: string[];
+  }>({});
+
+  // Language mapping for translation API
+  const getLanguageCode = (langCode: string) => {
+    const mapping: { [key: string]: string } = {
+      'en': 'en',
+      'es': 'es',
+      'fr': 'fr',
+      'de': 'de',
+      'it': 'it',
+      'pt': 'pt',
+      'ru': 'ru',
+      'ja': 'ja',
+      'zh': 'zh',
+      'ko': 'ko',
+      'ar': 'ar',
+      'hi': 'hi'
+    };
+    return mapping[langCode] || 'en';
+  };
+
+  // Auto-translate content when language changes
+  useEffect(() => {
+    if (result?.status === "ok" && i18n.language !== 'en') {
+      translateContent();
+    }
+  }, [i18n.language, result]);
+
+  const translateContent = async () => {
+    if (!result || i18n.language === 'en') return;
+
+    const targetLang = getLanguageCode(i18n.language);
+    const newTranslations: { transcription?: string; reasons?: string[] } = {};
+
+    try {
+      // Translate transcription
+      if (result.transcription) {
+        const { data: transcriptionData } = await translateText(result.transcription, targetLang);
+        if (transcriptionData?.translatedText) {
+          newTranslations.transcription = transcriptionData.translatedText;
+        }
+      }
+
+      // Translate scam reasons
+      if (result.scam?.reasons && Array.isArray(result.scam.reasons)) {
+        const reasonPromises = result.scam.reasons.map((reason: string) => 
+          translateText(reason, targetLang)
+        );
+        const reasonResults = await Promise.all(reasonPromises);
+        newTranslations.reasons = reasonResults
+          .map(({ data }) => data?.translatedText)
+          .filter(Boolean);
+      }
+
+      setTranslations(newTranslations);
+    } catch (error) {
+      console.error('Translation error:', error);
+    }
+  };
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0] ?? null;
@@ -21,6 +84,7 @@ const Index = () => {
     }
     setFile(f);
     setResult(null);
+    setTranslations({});
   };
 
   const onAnalyze = async () => {
@@ -29,12 +93,17 @@ const Index = () => {
       return;
     }
     setLoading(true);
+    setTranslations({});
     try {
       const { data, error } = await analyzeAudio(file);
       if (error) throw error;
       setResult(data);
       if (data?.status === "ok") {
         toast({ title: t("toast.analysisComplete"), description: t("toast.analysisCompleteDesc") });
+        // Auto-translate if UI language is not English
+        if (i18n.language !== 'en') {
+          setTimeout(() => translateContent(), 100);
+        }
       } else if (data?.status === "error") {
         const msg = data?.error?.message || data?.message || t("toast.analysisFailed");
         toast({ title: t("toast.analysisFailed"), description: msg, variant: "destructive" });
@@ -50,6 +119,7 @@ const Index = () => {
 
   const scamProbPercent = typeof result?.scam?.probability === "number" ? Math.round(result.scam.probability * 100) : null;
   const scamLabel = result?.scam?.label as string | undefined;
+  const currentLang = i18n.language;
 
   return (
     <main className="min-h-screen bg-background text-foreground">
@@ -76,7 +146,7 @@ const Index = () => {
               <Button onClick={onAnalyze} disabled={loading || !file}>
                 {loading ? t("analyzingButton") : t("analyzeButton")}
               </Button>
-              <Button variant="ghost" onClick={() => { setFile(null); setResult(null); }} disabled={loading && !result}>
+              <Button variant="ghost" onClick={() => { setFile(null); setResult(null); setTranslations({}); }} disabled={loading && !result}>
                 {t("resetButton")}
               </Button>
             </div>
@@ -100,11 +170,21 @@ const Index = () => {
                     <p className="text-sm text-muted-foreground mb-1">{scamLabel ? scamLabel.replace("_", " ") : ""}</p>
                     <p className="text-2xl font-bold">{scamProbPercent}%</p>
                     {Array.isArray(result?.scam?.reasons) && result.scam.reasons.length > 0 && (
-                      <ul className="mt-2 list-disc pl-5 text-sm text-muted-foreground">
-                        {result.scam.reasons.map((r: string, idx: number) => (
-                          <li key={idx}>{r}</li>
-                        ))}
-                      </ul>
+                      <div className="mt-2">
+                        <h3 className="text-sm font-medium mb-1">{t("indicators")}</h3>
+                        <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+                          {result.scam.reasons.map((r: string, idx: number) => (
+                            <li key={idx}>
+                              <div>{r}</div>
+                              {currentLang !== 'en' && translations.reasons?.[idx] && (
+                                <div className="text-xs text-muted-foreground/80 mt-1 italic">
+                                  {translations.reasons[idx]}
+                                </div>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     )}
                   </div>
                 )}
@@ -144,7 +224,22 @@ const Index = () => {
                 {typeof result?.transcription === "string" && result.transcription && (
                   <div className="rounded-md border border-input p-4">
                     <h2 className="text-lg font-semibold mb-2">{t("transcription")}</h2>
-                    <p className="whitespace-pre-wrap text-sm leading-6">{result.transcription}</p>
+                    <div className="space-y-3">
+                      <div>
+                        <h3 className="text-sm font-medium text-muted-foreground mb-1">Original:</h3>
+                        <p className="whitespace-pre-wrap text-sm leading-6">{result.transcription}</p>
+                      </div>
+                      {currentLang !== 'en' && translations.transcription && (
+                        <div>
+                          <h3 className="text-sm font-medium text-muted-foreground mb-1">
+                            {t("title")} ({currentLang.toUpperCase()}):
+                          </h3>
+                          <p className="whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+                            {translations.transcription}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
